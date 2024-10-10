@@ -1,0 +1,965 @@
+
+enum MyButton {
+  bandingButton,
+  discountButton,
+  returnButton,
+}
+
+class Product {
+  String name;
+  int productId;
+  String status;
+
+  Product(
+    this.name,
+    this.productId,
+    this.status,
+  );
+}
+
+class RequestDetailsScreen extends StatefulWidget {
+  final String vendorName;
+  final String vendorId;
+  final int requestId;
+  const RequestDetailsScreen({
+    Key? key,
+    required this.vendorName,
+    required this.vendorId,
+    required this.requestId,
+  }) : super(key: key);
+
+  @override
+  State<RequestDetailsScreen> createState() => _RequestDetailsScreenState();
+}
+class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
+  List<Product> products = [];
+  Set<Product> selectedProducts = Set<Product>();
+  List<Product> selectedProductDetails = [];
+  List<Map<String, dynamic>> detailsList = [];
+  SalesManApiService salesManApiService = SalesManApiService();
+
+  MyButton currentButton = MyButton.bandingButton; // Default button
+  String bannerMessage = '';
+  bool shouldDisplayBanner = false;
+  String vendorName = "";
+  late Willpop willpop;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    willpop = Willpop(context);
+    vendorName = widget.vendorName;
+    print("Request ID:>>>${widget.requestId}");
+    _fetchSalesmanData();
+  }
+  Future<void> _fetchSalesmanData() async {
+    try {
+      EasyLoading.show(
+          status: 'Loading...',
+          maskType: EasyLoadingMaskType.black,
+          dismissOnTap: false);
+      SalesManApiService apiCall = SalesManApiService();
+      SalesmanRequestById salesmanData =
+          await apiCall.getSalesManRequestById(widget.requestId);
+
+      setState(() {
+        products = salesmanData.data
+            .map((datum) => Product(
+                  datum.prdouctName,
+                  datum.prdouctId,
+                  datum.status,
+                ))
+            .toList();
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+  void updateRequest() async {
+    try {
+      EasyLoading.show(
+          status: 'Please wait...',
+          dismissOnTap: false,
+          maskType: EasyLoadingMaskType.black);
+      var apiUrl = Uri.parse(Urls.requestUpdate);
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization':token
+           
+      };
+      final Map<String, dynamic> requestBody = {
+        "RequestID": widget.requestId,
+        "RequestUpdationMode": "S",
+        "Details": detailsList
+      };
+      print("JsonBody:${requestBody}");
+
+      var requestBodyJson = jsonEncode(requestBody);
+      print("Encode Body : $requestBodyJson");
+      var response = await http.post(
+        apiUrl,
+        headers: headers,
+        body: requestBodyJson,
+      );
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      print("Response: $jsonResponse");
+
+      if (response.statusCode == 200) {
+        if (jsonResponse['isSuccess'] == true) {
+        } else if (jsonResponse["isSuccess"] == false) {
+          // showDialog(context: context, builder: builder)
+          ShowSuccessPopUp().errorPopup(
+              context: context, errorMessage: jsonResponse['message']);
+        }
+      } else {
+        ShowSuccessPopUp().errorPopup(
+            context: context, errorMessage: jsonResponse['message']);
+        print('Error: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        // errorPopup('An error occurred. Please try again.');
+      }
+    } catch (e) {
+      print(e);
+
+      ShowSuccessPopUp()
+          .errorPopup(context: context, errorMessage: e.toString());
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    String selectedItemsText = '';
+    if (selectedItemsText.isNotEmpty) {
+      selectedItemsText =
+          selectedItemsText.substring(0, selectedItemsText.length - 2);
+    }
+    return WillPopScope(
+        onWillPop: () async {
+        return willpop.onWillPop();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+          title: const Text(
+            "Details",
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 15),
+              child:
+                  GestureDetector(
+                onTap: () {
+                  DynamicAlertBox().logOut(context, "Do you Want to Logout", () {
+                    Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => SplashScreen()));
+                  });
+                },
+                child: CircleAvatar(
+                  radius: 22,
+                  child: Text("SM"),
+                ),
+              ),
+            ),
+          ],
+        ),
+        body: Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+          )),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                children: [
+                  Consumer<SalesManRequestProvider>(
+                      builder: (context, salesManRequestProvider, _) {
+                    return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        leading: CircleAvatar(
+                          child: Text(vendorName.substring(0, 1)),
+                        ),
+                        title: Text(
+                          vendorName,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          widget.vendorId,
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600),
+                        ));
+                  }),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      width: 150,
+                      decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.save,
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                detailsList.isEmpty
+                                    ? ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'Please select products to update.',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                          duration: Duration(seconds: 2),
+                                          behavior: SnackBarBehavior
+                                              .floating, // Use 'floating' for a floating style
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            side: BorderSide(
+                                                color: Colors
+                                                    .blue), // Adjust the color and width as needed
+                                          ),
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical:
+                                                  10), // Adjust margins as needed
+                                        ),
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            actionsAlignment:
+                                                MainAxisAlignment.center,
+                                            title: Column(
+                                              children: [
+                                                Text("Do you want to Update"),
+                                                const SizedBox(height: 10),
+                                              ],
+                                            ),
+                                            actions: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  TextButton(
+                                                      style: ButtonStyle(
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                    10.0), // Adjust the value as needed
+                                                            side: const BorderSide(
+                                                                color: Colors
+                                                                    .blue), // Change the color to the desired outline color
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        updateRequest();
+                                                      },
+                                                      child: Text("Yes")),
+                                                  const SizedBox(width: 15),
+                                                  TextButton(
+                                                      style: ButtonStyle(
+                                                        shape: MaterialStateProperty
+                                                            .all<
+                                                                RoundedRectangleBorder>(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                    10.0), // Adjust the value as needed
+                                                            side: const BorderSide(
+                                                                color: Colors
+                                                                    .blue), // Change the color to the desired outline color
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                           
+                              },
+                              child: Text("Save")),
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                      child: ListView.builder(
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            String firstLetter =
+                                products[index].name.substring(0, 1);
+                            Color statusColor = Colors.black; // Default color
+                            if (products[index].status == 'Banding') {
+                              statusColor = Colors.red;
+                            } else if (products[index].status == 'Discount') {
+                              statusColor = const Color.fromARGB(255, 5, 131, 9);
+                            } else if (products[index].status == 'Return') {
+                              statusColor =
+                                  const Color.fromARGB(255, 255, 153, 0);
+                            }
+                            return Container(
+                              decoration: BoxDecoration(
+                                  color:
+                                      selectedProducts.contains(products[index])
+                                          ? Colors.blue.withOpacity(0.3)
+                                          : Colors.white,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    style: ListTileStyle.drawer,
+                                    contentPadding: EdgeInsets.zero,
+                                    dense: true,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    leading: Column(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
+                                          child: CircleAvatar(
+                                            child: Text(firstLetter),
+                                    ),
+                                    title: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Divider(),
+                                              Text(
+                                                products[index].name,
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w500),
+                                              ),
+                                              Text(
+                                                products[index]
+                                                    .productId
+                                                    .toString(),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 8.0, right: 8.0),
+                                            child: Text(
+                                              products[index].status,
+                                              style: TextStyle(
+                                                  color: statusColor,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w800),
+                                    ),
+                                    trailing: Column(
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              int requestId = widget.requestId;
+                                              int productId = products[index]
+                                                  .productId;
+                                              try {
+                                                SalesManDetailsInfoModel result =
+                                                    await salesManApiService
+                                                        .getSalesManRequestByIdInfo(
+                                                            requestId, productId);
+                                                print(
+                                                    "Info:>>>>${result.data[index]}");
+                                                //  createModelBottomSheet(
+                                                // context, result as String);
+                                                modelBottomSheet(context, result);
+                                              } catch (e) {
+                                                print("API call failed: $e");
+                                              }
+                                            },
+                                            icon: Icon(Icons.info,
+                                                color: Colors.black
+                                                    .withOpacity(0.3)))
+                                      ],
+                                    ),
+                                    tileColor:
+                                        selectedProducts.contains(products[index])
+                                            ? Colors.blue.withOpacity(0.7)
+                                            : null,
+                                    onTap: () {
+                                      setState(() {
+                                        _toggleSelection(products[index]);
+                               
+                          })),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.block,
+                                color: Colors.blue,
+                              ),
+                              SizedBox(
+                                child: TextButton(
+                                  onPressed: () {
+                                    _dialogeBox(
+                                        context,
+                                        "Banding",
+                                        "Do you want to Proceed ?\n\n$selectedItemsText",
+                                        "Procced",
+                                        MyButton.bandingButton,
+                                        selectedProducts.toList());
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.white),
+                                    shape:
+                                        MaterialStateProperty.all<OutlinedBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            10), // Border radius
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Bandinng",
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                "assets/discount (1).png",
+                                height: 20,
+                                width: 20,
+                              ),
+                              SizedBox(
+                                // width: 150,
+                                child: TextButton(
+                                  onPressed: () {
+                                    _dialogeBox(
+                                        context,
+                                        "Discount",
+                                        "Do you want to Proceed \n\n$selectedItemsText",
+                                        "Procced",
+                                        MyButton.discountButton,
+                                        selectedProducts.toList());
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.white),
+                                    shape:
+                                        MaterialStateProperty.all<OutlinedBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            10), // Border radius
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Discount",
+                                    style: TextStyle(color: Colors.blue),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.blue)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.keyboard_return,
+                                color: Colors.blue,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              SizedBox(
+                                // width: 150,
+                                child: TextButton(
+                                  onPressed: () {
+                                    _dialogeBox(
+                                        context,
+                                        "Return",
+                                        "Do you want to Proceed \n\n$selectedItemsText",
+                                        "Proceed",
+                                        MyButton.returnButton,
+                                        selectedProducts.toList());
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.white),
+                                    shape:
+                                        MaterialStateProperty.all<OutlinedBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            10), // Border radius
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Return",
+                                    style: TextStyle(
+                                        color: const Color.fromRGBO(
+                                            33, 150, 243, 1)),
+    );
+  Future<dynamic> _dialogeBox(
+      BuildContext context,
+      String title,
+      String subtitle,
+      String btnText,
+      MyButton buttonType,
+      List<Product> selectedProducts) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              Text(title),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  subtitle,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel")),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (buttonType == MyButton.bandingButton) {
+                          _updateStatus(selectedProducts, 'Banding');
+                          createDataList();
+                          setState(() {});
+                        } else if (buttonType == MyButton.discountButton) {
+                          _updateStatus(selectedProducts, 'Discount');
+                          createDataList();
+                          setState(() {});
+                        } else if (buttonType == MyButton.returnButton) {
+                          _updateStatus(selectedProducts,
+                              'Return'); // Trigger a rebuild after updating the status
+                          createDataList();
+                          setState(() {});
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xff0674e5),
+                              Color(0xff0344aa)
+                            ], // Adjust colors as needed
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                        ),
+                        height: 45,
+                        width: 100,
+                        child: Center(
+                          child: Text(
+                            btnText,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 16),
+          ),
+        );
+      },
+    );
+  }
+  String getButtonTitle(MyButton buttonType) {
+    switch (buttonType) {
+      case MyButton.bandingButton:
+        return "Banding";
+      case MyButton.discountButton:
+        return "Discount";
+      case MyButton.returnButton:
+        return "Return";
+    }
+  }
+  void _toggleSelection(Product product) {
+    setState(() {
+      if (selectedProducts.contains(product)) {
+        selectedProducts.remove(product);
+      } else {
+        selectedProducts.add(product);
+      }
+    });
+  }
+  void _updateStatus(List<Product> selectedProducts, String status) {
+    setState(() {
+      for (Product product in selectedProducts) {
+        product.status = status;
+      }
+    });
+    setState(() {
+   
+    });
+  }
+  void createDataList() {
+    selectedProducts.forEach((product) {
+      detailsList.add({
+        "Id": product.productId,
+        "SiNo": 1,
+        "Banding": product.status == 'Banding' ? true : false,
+        "Discount": product.status == 'Discount' ? true : false,
+        "Return": product.status == 'Return' ? true : false,
+        "Approved": false,
+        "Rejected": false,
+      });
+    });
+  }
+}
+ Future<dynamic> _dialogeBox(
+      BuildContext context,
+      String title,
+      String subtitle,
+      String btnText,
+      MyButton buttonType,
+      List<Product> selectedProducts) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              Text(title),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  subtitle,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel")),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (buttonType == MyButton.bandingButton) {
+                          _updateStatus(selectedProducts, 'Banding');
+                          createDataList();
+                          setState(() {});
+                        } else if (buttonType == MyButton.discountButton) {
+                          _updateStatus(selectedProducts, 'Discount');
+                          createDataList();
+                          setState(() {});
+                        } else if (buttonType == MyButton.returnButton) {
+                          _updateStatus(selectedProducts,
+                              'Return'); // Trigger a rebuild after updating the status
+                          createDataList();
+                          setState(() {});
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xff0674e5),
+                              Color(0xff0344aa)
+                            ], // Adjust colors as needed
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                        ),
+                        height: 45,
+                        width: 100,
+                        child: Center(
+                          child: Text(
+                            btnText,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 16),
+     
+      },
+    );
+  }
+  String getButtonTitle(MyButton buttonType) {
+    switch (buttonType) {
+      case MyButton.bandingButton:
+        return "Banding";
+      case MyButton.discountButton:
+        return "Discount";
+      case MyButton.returnButton:
+        return "Return";
+    }
+  }
+  void _toggleSelection(Product product) {
+    setState(() {
+      if (selectedProducts.contains(product)) {
+        selectedProducts.remove(product);
+      } else {
+        selectedProducts.add(product);
+      }
+    });
+  }
+  void _updateStatus(List<Product> selectedProducts, String status) {
+    setState(() {
+      for (Product product in selectedProducts) {
+        product.status = status;
+      }
+    });
+    setState(() {
+   
+    });
+  }
+  void createDataList() {
+    selectedProducts.forEach((product) {
+      detailsList.add({
+        "Id": product.productId,
+        "SiNo": 1,
+        "Banding": product.status == 'Banding' ? true : false,
+        "Discount": product.status == 'Discount' ? true : false,
+        "Return": product.status == 'Return' ? true : false,
+        "Approved": false,
+        "Rejected": false,
+      });
+    });
+    print("wwwwwwwwwwwwwww:>>>$detailsList");
+  }
+}
+//////////////////
+import 'package:flutter/material.dart';
+
+class SelectionProvider extends ChangeNotifier {
+  Set<int> selectedItems = {};
+
+  void toggleSelection(int itemId) {
+    if (selectedItems.contains(itemId)) {
+      selectedItems.remove(itemId);
+    } else {
+      selectedItems.add(itemId);
+    }
+
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    selectedItems.clear();
+    notifyListeners();
+  }
+}
+ChangeNotifierProvider(
+  create: (context) => SelectionProvider(),
+  child: YourAppRootWidget(),
+)
+Provider.of<SelectionProvider>(context, listen: false).clearSelection();
+GestureDetector(
+  onTap: () {
+    Provider.of<SelectionProvider>(context, listen: false)
+        .toggleSelection(itemId);
+  },
+  child: YourItemWidget(),
+)
+Consumer<SelectionProvider>(
+  builder: (context, selectionProvider, _) {
+    // Your UI code here
+    // Use selectionProvider.selectedItems to get the selected items
+    // Wrap your item widgets with GestureDetector or InkWell to handle taps
+  },
+)
+Expanded(
+  child: Consumer<SelectionProvider>(
+    builder: (context, selectionProvider, _) {
+      return ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          String firstLetter = products[index].name.substring(0, 1);
+          Color statusColor = Colors.black;
+
+          if (products[index].status == 'Banding') {
+            statusColor = Colors.red;
+          } else if (products[index].status == 'Discount') {
+            statusColor = const Color.fromARGB(255, 5, 131, 9);
+          } else if (products[index].status == 'Return') {
+            statusColor = const Color.fromARGB(255, 255, 153, 0);
+          }
+
+          return GestureDetector(
+            onTap: () {
+              selectionProvider.toggleSelection(products[index]);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: selectionProvider.selectedProducts.contains(products[index])
+                    ? Colors.blue.withOpacity(0.3)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    style: ListTileStyle.drawer,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    leading: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: CircleAvatar(
+                            child: Text(firstLetter),
+                          ),
+                        ),
+                      ],
+                    ),
+                    title: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                products[index].name,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                products[index].productId.toString(),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                            child: Text(
+                              products[index].status,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    trailing: Column(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            int requestId = widget.requestId;
+                            int productId = products[index].productId;
+                            try {
+                              SalesManDetailsInfoModel result =
+                                  await salesManApiService
+                                      .getSalesManRequestByIdInfo(
+                                          requestId, productId);
+                              print("Info:>>>>${result.data[index]}");
+                              modelBottomSheet(context, result);
+                            } catch (e) {
+                              print("API call failed: $e");
+                            }
+                          },
+                          icon: Icon(
+                            Icons.info,
+                            color: Colors.black.withOpacity(0.3),
+                          ),
+                        ),
+                      ],
+                    ),
+                    tileColor: selectionProvider.selectedProducts.contains(products[index])
+                        ? Colors.blue.withOpacity(0.7)
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  ),
+)
