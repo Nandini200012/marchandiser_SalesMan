@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(360, 740),
       minTextAdapt: true,
-      splitScreenMode: true,
+      splitScreenMode: true, 
       builder: (_, child) {
         return MaterialApp(
           title: 'Marchandise_App',

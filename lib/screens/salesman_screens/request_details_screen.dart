@@ -299,7 +299,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context, designSize: Size(375, 812));
     return WillPopScope(
-      onWillPop: () async => willpop.onWillPop(),
+      onWillPop: () async => _onBackPressed(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: _buildAppBar(),
@@ -344,7 +344,12 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     return AppBar(
       backgroundColor: Color(0xFFFFF9C4),
       leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () async {
+          bool shouldExit = await _onBackPressed(); // ✅
+          if (shouldExit) {
+            Navigator.of(context).pop();
+          }
+        },
         icon: const Icon(Icons.arrow_back, color: Colors.black),
       ),
       title: Text(
@@ -1467,5 +1472,26 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> _onBackPressed() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Exit without saving?'),
+            content: Text('Are you sure you want to exit without saving?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false), // Block back
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true), // Allow back
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
   }
 }
