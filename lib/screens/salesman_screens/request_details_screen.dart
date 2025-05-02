@@ -478,7 +478,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                 style: TextStyle(color: Colors.grey[700]),
                               ),
                               Text(
-                                'Expiry Date : ${_formattedExpiryDate(product.expiryDate)}',
+                                'Exp Date : ${_formattedExpiryDate(product.expiryDate)}',
                                 style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],
@@ -503,9 +503,14 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                 'Unit : ${product.uom.toString()}',
                                 style: TextStyle(color: Colors.grey[700]),
                               ),
-                              Text(
-                                'Price : ${product.cost.toStringAsFixed(3)}',
-                                style: TextStyle(color: Colors.grey[700]),
+                              GestureDetector(
+                                onTap: () {
+                                  _showEditPriceDialog(product);
+                                },
+                                child: Text(
+                                  'Price : ${product.cost.toStringAsFixed(3)}',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
                               ),
                             ],
                           ),
@@ -810,7 +815,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   onTap: () {
                     setState(() {
                       product.isValid = true;
-                      product.status = 'Discount';
+                      // product.status = 'Discount';
                       product.editingDiscount = true;
                     });
                     Navigator.pop(context);
@@ -967,10 +972,12 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                   product.discountPercentage = discount;
                                   product.discountAmount =
                                       (product.cost ?? 0) * (discount / 100);
+                                  product.status = 'Discount';
                                 } else {
                                   product.discountAmount = discount;
                                   product.discountPercentage =
                                       (discount / (product.cost ?? 1)) * 100;
+                                  product.status = 'Discount';
                                 }
                               });
                             }
@@ -1122,10 +1129,27 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     );
   }
 
+  void _showDiscountValidationError() {
+    Flushbar(
+      message: 'Please apply a discount percentage or amount first',
+      backgroundColor: Colors.red,
+      flushbarPosition: FlushbarPosition.TOP,
+      duration: Duration(seconds: 3),
+    ).show(context);
+  }
+
   void _updateProductStatus(MyButton buttonType, Product product) {
     String newStatus = _getButtonTitle(buttonType);
-    print(
-        "Current status: ${product.status}, New status: $newStatus"); // Debug print
+
+    // Special validation for Discount status
+    if (newStatus == "Discount") {
+      // Check if discount value is empty or zero
+      if (product.discountValue.isEmpty ||
+          double.tryParse(product.discountValue) == 0.0) {
+        _showDiscountValidationError();
+        return; // Exit without changing status
+      }
+    }
 
     if (newStatus != "Split" && product.status == "Split") {
       setState(() {
@@ -1493,5 +1517,72 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           ),
         )) ??
         false;
+  }
+
+  void _showEditPriceDialog(Product product) {
+    TextEditingController _priceController =
+        TextEditingController(text: product.cost.toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            String errorMessage = '';
+
+            return AlertDialog(
+              title: Text('Edit Price'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _priceController,
+                    decoration: InputDecoration(
+                      hintText: "Enter Price",
+                      errorText: errorMessage.isNotEmpty ? errorMessage : null,
+                    ),
+                    keyboardType:
+                        TextInputType.numberWithOptions(decimal: true),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Save'),
+                  onPressed: () {
+                    double? enteredPrice =
+                        double.tryParse(_priceController.text);
+
+                    if (enteredPrice == null || enteredPrice <= 0) {
+                      setStateDialog(() {
+                        errorMessage = 'Price must be greater than zero';
+                      });
+                      Flushbar(
+                        message: 'Price must be greater than zero',
+                        backgroundColor: Colors.red,
+                        flushbarPosition: FlushbarPosition.TOP,
+                        duration: Duration(seconds: 3),
+                      ).show(context);
+                    } else {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        product.cost = enteredPrice;
+                        createDataList(); // Update the data list when price changes
+                      });
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }
