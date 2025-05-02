@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:marchandise/provider/split_provider.dart';
+import 'package:marchandise/screens/model/comment_model.dart';
 import 'package:marchandise/screens/salesman_screens/api_service/salesman_api_service.dart';
 import 'package:marchandise/screens/salesman_screens/model/salesman_request_by_id_model.dart';
 import 'package:marchandise/screens/salesman_screens/model/salesman_request_list_model.dart';
 import 'package:marchandise/screens/salesman_screens/salesman_bottom_navbar.dart';
 import 'package:marchandise/screens/salesman_screens/split_screen.dart';
+import 'package:marchandise/utils/comment_box.dart';
 import 'package:marchandise/utils/constants.dart';
 import 'package:marchandise/utils/show_success_pop_up.dart';
 import 'package:marchandise/utils/urls.dart';
@@ -603,6 +605,23 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
             ),
           ),
           Positioned(
+            bottom: 10
+                .h, // Reduced the gap between the button and the bottom of the card
+            left: 0,
+            right: 10,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    showCommentPopup(context);
+                  },
+                  icon: Icon(Icons.message),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
             bottom:
                 10, // Reduced the gap between the button and the bottom of the card
             left: 0,
@@ -626,6 +645,93 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       ),
     );
   }
+
+  // void showCommentPopup(BuildContext context) {
+  //   List<String> comments = ['Nice post!', 'Interesting!', 'Well said!'];
+
+  //   void showAddCommentDialog() {
+  //     TextEditingController _commentController = TextEditingController();
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: Text('Add Comment'),
+  //           content: TextField(
+  //             controller: _commentController,
+  //             maxLines: 3,
+  //             decoration: InputDecoration(
+  //               hintText: 'Enter your comment',
+  //               border: OutlineInputBorder(),
+  //             ),
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               child: Text('Cancel'),
+  //             ),
+  //             ElevatedButton(
+  //               onPressed: () {
+  //                 if (_commentController.text.isNotEmpty) {
+  //                   comments.add(_commentController.text);
+  //                 }
+  //                 Navigator.pop(context);
+  //               },
+  //               child: Text('Submit'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return AlertDialog(
+  //             title: Text('Comments'),
+  //             content: Container(
+  //               width: double.maxFinite,
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   Expanded(
+  //                     child: ListView.builder(
+  //                       shrinkWrap: true,
+  //                       itemCount: comments.length,
+  //                       itemBuilder: (context, index) {
+  //                         return ListTile(
+  //                           leading: Icon(Icons.comment),
+  //                           title: Text(comments[index]),
+  //                         );
+  //                       },
+  //                     ),
+  //                   ),
+  //                   Align(
+  //                     alignment: Alignment.centerRight,
+  //                     child: IconButton(
+  //                       icon: Icon(Icons.add_comment),
+  //                       onPressed: () {
+  //                         showAddCommentDialog();
+  //                       },
+  //                     ),
+  //                   )
+  //                 ],
+  //               ),
+  //             ),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () => Navigator.pop(context),
+  //                 child: Text('Close'),
+  //               )
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   String _formattedExpiryDate(String expiryDateString) {
     try {
