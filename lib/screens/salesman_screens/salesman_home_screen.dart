@@ -6,6 +6,7 @@ import 'package:marchandise/screens/salesman_screens/api_service/salesman_api_se
 import 'package:marchandise/screens/salesman_screens/model/salesman_request_list_model.dart';
 import 'package:marchandise/screens/salesman_screens/request_details_screen.dart';
 import 'package:marchandise/screens/splash_screen.dart';
+import 'package:marchandise/utils/comment_box.dart';
 import 'package:marchandise/utils/dynamic_alert_box.dart';
 import 'package:marchandise/utils/willpop.dart';
 import 'package:provider/provider.dart';
@@ -522,6 +523,14 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                                               ),
                                                             ),
                                                           ),
+                                                          IconButton(
+                                                            onPressed: () {
+                                                              showCommentPopup(
+                                                                  context);
+                                                            },
+                                                            icon: Icon(
+                                                                Icons.message),
+                                                          )
                                                         ],
                                                       ),
                                                     ),
@@ -546,6 +555,42 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  commentPopup() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        TextEditingController _commentController = TextEditingController();
+        return AlertDialog(
+          title: Text('Add Comment'),
+          content: TextField(
+            controller: _commentController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Enter your comment',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the popup
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String comment = _commentController.text;
+                // TODO: Handle comment submission logic here
+                Navigator.pop(context);
+              },
+              child: Text('Submit'),
+            ),
+          ],
         );
       },
     );
