@@ -1,14 +1,21 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as flutterMaterial;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:marchandise/model/report_list_model.dart';
 import 'package:marchandise/screens/manager_screens/api_service/manager_api_service.dart';
+import 'package:marchandise/screens/model/Vendors.dart';
+import 'package:marchandise/screens/salesman_screens/model/merchendiser_api_service.dart';
 import 'package:marchandise/screens/salesman_screens/salesman_report_details_screen.dart';
 import 'package:marchandise/screens/splash_screen.dart';
 import 'package:marchandise/utils/dynamic_alert_box.dart';
+import 'package:marchandise/utils/urls.dart';
 import 'package:marchandise/utils/willpop.dart';
+import 'package:http/http.dart' as http;
 
 class SalesmanDashboardScreen extends StatefulWidget {
   const SalesmanDashboardScreen({super.key});
@@ -20,6 +27,8 @@ class SalesmanDashboardScreen extends StatefulWidget {
 
 class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
   final ManagerApiService apiService = ManagerApiService();
+  final MerchendiserApiService merchandiserapiService =
+      MerchendiserApiService();
   Faker faker = Faker();
   DateTime _selectedDate = DateTime.now();
   DateTime currentDate = DateTime.now();
@@ -29,11 +38,27 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
   DateTime _selectedFromDate = DateTime.now();
   DateTime _selectedToDate = DateTime.now();
 
+// new
+  List<Vendors> vendorList = [];
+  List<Map<String, dynamic>> salesPersonList = [];
+  String? selectedVendor;
+  int? selectedVendorID;
+  String? selectedSalesPerson;
+  int? selectedSalesPersonID;
+  TextEditingController vendorController = TextEditingController();
+  TextEditingController salesPersonController = TextEditingController();
+
+  bool isLoading = false;
+  int currentPage = 1;
+  final int pageSize = 20;
   @override
   void initState() {
     super.initState();
     willpop = Willpop(context);
+
     fetchData("B");
+    fetchVendors();
+    fetchSalesPersonList();
   }
 
   void fetchData(String filterMode) async {
@@ -51,6 +76,101 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
       });
     } catch (e) {
       print("Error fetching data: $e");
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchSalesPersonList() async {
+    try {
+      var response = await http.get(
+        Uri.parse(Urls.getSalesPersons),
+      );
+      if (response.statusCode == 200) {
+        log('salesperson: ${response.body}');
+        var decodedResponse = jsonDecode(response.body);
+        if (decodedResponse['isSuccess']) {
+          List<dynamic> salesPersonsData =
+              decodedResponse['data']['salesPersons'];
+          final mappedList = salesPersonsData
+              .map<Map<String, dynamic>>((e) => {
+                    "salesPersonID": e['salesPerson'],
+                    "salesPersonName": e['salesPersonName']
+                  })
+              .toList();
+          setState(() {
+            salesPersonList = mappedList; // Assign the mapped list
+          });
+          return mappedList;
+        } else {
+          throw Exception('API call was not successful');
+        }
+      } else {
+        throw Exception('Failed to load salespersons');
+      }
+    } catch (e) {
+      print("Error fetching salespersons: $e");
+      return [];
+    }
+  }
+  // Future<List<Map<String, dynamic>>> fetchSalesPersonList() async {
+  //   Map<String, String> headers = {
+  //     'IsManager': 'null',
+  //     'selectedTab': '',
+  //   };
+  //   var response = await http.get(
+  //     Uri.parse(Urls.getSalesPersons),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     log('salesperson: ${response.body}');
+  //     var decodedResponse = jsonDecode(response.body);
+  //     if (decodedResponse['isSuccess']) {
+  //       List<dynamic> salesPersonsData =
+  //           decodedResponse['data']['salesPersons'];
+  //       setState(() {
+  //         salesPersonList = decodedResponse['data']['salesPersons'];
+  //       });
+  //       return salesPersonsData
+  //           .map<Map<String, dynamic>>((e) => {
+  //                 "salesPersonID": e['salesPerson'],
+  //                 "salesPersonName": e['salesPersonName']
+  //               })
+  //           .toList();
+  //     } else {
+  //       throw Exception('API call was not successful');
+  //     }
+  //   } else {
+  //     throw Exception('Failed to load salespersons');
+  //   }
+  // }
+
+  Future<void> fetchVendors({String query = '', int page = 1}) async {
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final newVendors = await merchandiserapiService.fetchVendors(
+        query: query,
+        page: page,
+        pageSize: pageSize,
+      );
+      setState(() {
+        if (page == 1) {
+          vendorList = newVendors;
+        } else {
+          vendorList.addAll(newVendors);
+        }
+        currentPage = page;
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $error')));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -182,6 +302,188 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
                               ),
                             ),
                           ),
+                          Expanded(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  maxWidth: 200.w, maxHeight: 255.h),
+                              child: TypeAheadFormField<Vendors>(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: vendorController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Select Customer',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    suffixIcon: vendorController.text.isEmpty
+                                        ? Icon(Icons.search)
+                                        : IconButton(
+                                            icon: Icon(Icons.close),
+                                            onPressed: () {
+                                              setState(() {
+                                                vendorController.clear();
+                                                selectedVendor = null;
+                                                selectedVendorID = null;
+                                                // _refreshCurrentTab();
+                                              });
+                                            },
+                                          ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                ),
+                                suggestionsCallback: (pattern) {
+                                  return vendorList.where((vendor) => vendor
+                                      .vendorName
+                                      .toLowerCase()
+                                      .contains(pattern.toLowerCase()));
+                                },
+                                itemBuilder: (context, Vendors suggestion) {
+                                  return ListTile(
+                                    title: Text(suggestion.vendorName),
+                                    subtitle: Text(suggestion.vendorCode),
+                                  );
+                                },
+                                onSuggestionSelected: (Vendors suggestion) {
+                                  setState(() {
+                                    selectedVendor = suggestion.vendorName;
+                                    selectedVendorID = suggestion.vendorId;
+                                    vendorController.text =
+                                        suggestion.vendorName;
+                                    // _refreshCurrentTab();
+                                  });
+                                },
+                                noItemsFoundBuilder: (context) => Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text('No Vendor found'),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: 500,
+                              ),
+                              child: TypeAheadFormField<Map<String, dynamic>>(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: salesPersonController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Select Salesperson',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    suffixIcon: salesPersonController
+                                            .text.isEmpty
+                                        ? Icon(Icons.search)
+                                        : IconButton(
+                                            icon: Icon(Icons.close),
+                                            onPressed: () {
+                                              setState(() {
+                                                salesPersonController.clear();
+                                                selectedSalesPerson = null;
+                                                selectedSalesPersonID = null;
+                                                // _refreshCurrentTab();
+                                              });
+                                            },
+                                          ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                  ),
+                                ),
+                                suggestionsCallback: (pattern) {
+                                  return salesPersonList.where((salesPerson) =>
+                                      salesPerson['salesPersonName']
+                                          .toLowerCase()
+                                          .contains(pattern.toLowerCase()));
+                                },
+                                itemBuilder:
+                                    (context, Map<String, dynamic> suggestion) {
+                                  return ListTile(
+                                    title: Text(suggestion['salesPersonName']),
+                                  );
+                                },
+                                onSuggestionSelected:
+                                    (Map<String, dynamic> suggestion) {
+                                  setState(() {
+                                    selectedSalesPerson =
+                                        suggestion['salesPersonName'];
+                                    selectedSalesPersonID =
+                                        suggestion['salesPersonID'];
+                                    salesPersonController.text =
+                                        suggestion['salesPersonName'];
+                                    // _refreshCurrentTab();
+                                  });
+                                },
+                                noItemsFoundBuilder: (context) => Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text('No Salesperson found'),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Expanded(
+                          //   child: ConstrainedBox(
+                          //     constraints: BoxConstraints(
+                          //       maxWidth: 500,
+                          //     ),
+                          //     child: TypeAheadFormField<Map<String, dynamic>>(
+                          //       textFieldConfiguration: TextFieldConfiguration(
+                          //         controller: salesPersonController,
+                          //         decoration: InputDecoration(
+                          //           labelText: 'Select Salesperson',
+                          //           border: OutlineInputBorder(
+                          //             borderRadius: BorderRadius.circular(10),
+                          //           ),
+                          //           suffixIcon: salesPersonController
+                          //                   .text.isEmpty
+                          //               ? Icon(Icons.search)
+                          //               : IconButton(
+                          //                   icon: Icon(Icons.close),
+                          //                   onPressed: () {
+                          //                     setState(() {
+                          //                       salesPersonController.clear();
+                          //                       selectedSalesPerson = null;
+                          //                       selectedSalesPersonID = null;
+                          //                       // _refreshCurrentTab();
+                          //                     });
+                          //                   },
+                          //                 ),
+                          //           filled: true,
+                          //           fillColor: Colors.white,
+                          //         ),
+                          //       ),
+                          //       suggestionsCallback: (pattern) {
+                          //         return salesPersonList.where((salesPerson) =>
+                          //             salesPerson['salesPersonName']
+                          //                 .toLowerCase()
+                          //                 .contains(pattern.toLowerCase()));
+                          //       },
+                          //       itemBuilder:
+                          //           (context, Map<String, dynamic> suggestion) {
+                          //         return ListTile(
+                          //           title: Text(suggestion['salesPersonName']),
+                          //         );
+                          //       },
+                          //       onSuggestionSelected:
+                          //           (Map<String, dynamic> suggestion) {
+                          //         setState(() {
+                          //           selectedSalesPerson =
+                          //               suggestion['salesPersonName'];
+                          //           selectedSalesPersonID =
+                          //               suggestion['salesPersonID'];
+                          //           salesPersonController.text =
+                          //               suggestion['salesPersonName'];
+                          //           // _refreshCurrentTab();
+                          //         });
+                          //       },
+                          //       noItemsFoundBuilder: (context) => Padding(
+                          //         padding: EdgeInsets.all(8.0),
+                          //         child: Text('No Salesperson found'),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(

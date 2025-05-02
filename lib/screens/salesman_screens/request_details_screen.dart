@@ -439,16 +439,16 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Color(0xFFFBC02D),
-                      child: Text(
-                        product.name.substring(0, 1),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: constraints.maxWidth > 600 ? 5.sp : 5.sp,
-                        ),
-                      ),
-                    ),
+                    // CircleAvatar(
+                    //   backgroundColor: Color(0xFFFBC02D),
+                    //   child: Text(
+                    //     product.name.substring(0, 1),
+                    //     style: TextStyle(
+                    //       color: Colors.white,
+                    //       fontSize: constraints.maxWidth > 600 ? 5.sp : 5.sp,
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(
                         width: constraints.maxWidth > 600
                             ? 8.w

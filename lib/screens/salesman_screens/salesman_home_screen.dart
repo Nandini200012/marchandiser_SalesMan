@@ -173,7 +173,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                 Row(
                                   children: [
                                     Container(
-                                      width: 250.w, // Maintain search box width
+                                      width: 200.w, // Maintain search box width
                                       decoration: BoxDecoration(
                                         borderRadius:
                                             BorderRadius.circular(10.r),
