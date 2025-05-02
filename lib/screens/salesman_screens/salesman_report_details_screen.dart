@@ -141,7 +141,14 @@ class _SalesManReportDetailsScreenState
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [Text("No data available")],
                                   )
-                                : ListView.builder(
+                                // gridview nandini changes
+                                : GridView.builder(
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 3,
+                                            crossAxisSpacing: 8.0,
+                                            mainAxisSpacing: 8.0,
+                                            childAspectRatio: 5 / 2.4),
                                     itemCount:
                                         reportDetailsListModel.data.length ?? 0,
                                     itemBuilder: (context, index) {
@@ -149,110 +156,101 @@ class _SalesManReportDetailsScreenState
                                           reportDetailsListModel.data[index];
                                       return Stack(
                                         children: [
-                                          Card(
-                                            elevation: 4,
-                                            child: ListTile(
-                                              title: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "ItemCode : ${data.prdouctId}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp),
-                                                  ),
-                                                  Text(
-                                                    "Product Name : ${data.prdouctName}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp),
-                                                  ),
-                                                  Text(
-                                                    "Quantity : ${data.quantity.toStringAsFixed(2)}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp),
-                                                  ),
-                                                  if (filterModeselection ==
-                                                      'D') ...[
+                                          Container(
+                                            width: double.infinity,
+                                            child: Card(
+                                              elevation: 4,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
                                                     Text(
-                                                      "DiscMode : ${data.discMode}",
+                                                      "ItemCode : ${data.prdouctId}",
                                                       style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          fontSize: 5.sp),
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 5.sp,
+                                                      ),
                                                     ),
-                                                    // Show percentage if mode is percentage
-                                                    if (data.discMode ==
-                                                        "Percentage")
+                                                    Text(
+                                                      // 'dghjkesruejrfbj hjrbetmnsg berdmewrgs dfjghjsdbfjwejfhmehjv  iuweku  orkeqjewru oewihi',
+                                                      "Product Name : ${data.prdouctName}",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 5.sp,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "Quantity : ${data.quantity.toStringAsFixed(2)}",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 5.sp,
+                                                      ),
+                                                    ),
+                                                    if (filterModeselection ==
+                                                        'D') ...[
                                                       Text(
-                                                        "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
+                                                        "DiscMode : ${data.discMode}",
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.w400,
                                                           fontSize: 5.sp,
                                                         ),
                                                       ),
-                                                    // Show amount if mode is amount
-                                                    if (data.discMode ==
-                                                        "Amount")
-                                                      Text(
-                                                        "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          fontSize: 5.sp,
+                                                      // Show percentage if mode is percentage
+                                                      if (data.discMode ==
+                                                          "Percentage")
+                                                        Text(
+                                                          "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize: 5.sp,
+                                                          ),
                                                         ),
+                                                      // Show amount if mode is amount
+                                                      if (data.discMode ==
+                                                          "Amount")
+                                                        Text(
+                                                          "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize: 5.sp,
+                                                          ),
+                                                        ),
+                                                    ],
+                                                    Text(
+                                                      "Expiry Date : ${data.expiryDate}",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 5.sp,
                                                       ),
+                                                    ),
+                                                    Text(
+                                                      "Note : ${data.note.isNotEmpty ? data.note : "N/A"}",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 5.sp,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "Reason : ${data.reason.isNotEmpty ? data.reason : "N/A"}",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        fontSize: 5.sp,
+                                                      ),
+                                                    ),
                                                   ],
-
-                                                  // // Show percentage if mode is percentage
-                                                  // if (data.discMode ==
-                                                  //     "Percentage")
-                                                  //   Text(
-                                                  //     "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
-                                                  //     style: TextStyle(
-                                                  //       fontWeight:
-                                                  //           FontWeight.w400,
-                                                  //       fontSize: 5.sp,
-                                                  //     ),
-                                                  //   ),
-                                                  // // Show amount if mode is amount
-                                                  // if (data.discMode == "Amount")
-                                                  //   Text(
-                                                  //     "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
-                                                  //     style: TextStyle(
-                                                  //       fontWeight:
-                                                  //           FontWeight.w400,
-                                                  //       fontSize: 5.sp,
-                                                  //     ),
-                                                  //   ),
-                                                  Text(
-                                                    "Expiry Date : ${data.expiryDate}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp),
-                                                  ),
-                                                  Text(
-                                                    "Note : ${data.note.isNotEmpty ? data.note : "N/A"}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp),
-                                                  ),
-                                                  Text(
-                                                    "Reason : ${data.reason.isNotEmpty ? data.reason : "N/A"}",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp),
-                                                  ),
-                                                ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -267,14 +265,150 @@ class _SalesManReportDetailsScreenState
                                               child: Text(
                                                 data.reqStatus,
                                                 style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 5.sp),
+                                                  color: Colors.white,
+                                                  fontSize: 5.sp,
+                                                ),
                                               ),
                                             ),
                                           )
                                         ],
                                       );
-                                    });
+                                    },
+                                  );
+                            // : ListView.builder(
+                            //     itemCount:
+                            //         reportDetailsListModel.data.length ?? 0,
+                            //     itemBuilder: (context, index) {
+                            //       Datum data =
+                            //           reportDetailsListModel.data[index];
+                            //       return Stack(
+                            //         children: [
+                            //           Card(
+                            //             elevation: 4,
+                            //             child: ListTile(
+                            //               title: Column(
+                            //                 crossAxisAlignment:
+                            //                     CrossAxisAlignment.start,
+                            //                 children: [
+                            //                   Text(
+                            //                     "ItemCode : ${data.prdouctId}",
+                            //                     style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 5.sp),
+                            //                   ),
+                            //                   Text(
+                            //                     "Product Name : ${data.prdouctName}",
+                            //                     style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 5.sp),
+                            //                   ),
+                            //                   Text(
+                            //                     "Quantity : ${data.quantity.toStringAsFixed(2)}",
+                            //                     style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 5.sp),
+                            //                   ),
+                            //                   if (filterModeselection ==
+                            //                       'D') ...[
+                            //                     Text(
+                            //                       "DiscMode : ${data.discMode}",
+                            //                       style: TextStyle(
+                            //                           fontWeight:
+                            //                               FontWeight.w400,
+                            //                           fontSize: 5.sp),
+                            //                     ),
+                            //                     // Show percentage if mode is percentage
+                            //                     if (data.discMode ==
+                            //                         "Percentage")
+                            //                       Text(
+                            //                         "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
+                            //                         style: TextStyle(
+                            //                           fontWeight:
+                            //                               FontWeight.w400,
+                            //                           fontSize: 5.sp,
+                            //                         ),
+                            //                       ),
+                            //                     // Show amount if mode is amount
+                            //                     if (data.discMode ==
+                            //                         "Amount")
+                            //                       Text(
+                            //                         "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
+                            //                         style: TextStyle(
+                            //                           fontWeight:
+                            //                               FontWeight.w400,
+                            //                           fontSize: 5.sp,
+                            //                         ),
+                            //                       ),
+                            //                   ],
+
+                            //                   // // Show percentage if mode is percentage
+                            //                   // if (data.discMode ==
+                            //                   //     "Percentage")
+                            //                   //   Text(
+                            //                   //     "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
+                            //                   //     style: TextStyle(
+                            //                   //       fontWeight:
+                            //                   //           FontWeight.w400,
+                            //                   //       fontSize: 5.sp,
+                            //                   //     ),
+                            //                   //   ),
+                            //                   // // Show amount if mode is amount
+                            //                   // if (data.discMode == "Amount")
+                            //                   //   Text(
+                            //                   //     "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
+                            //                   //     style: TextStyle(
+                            //                   //       fontWeight:
+                            //                   //           FontWeight.w400,
+                            //                   //       fontSize: 5.sp,
+                            //                   //     ),
+                            //                   //   ),
+                            //                   Text(
+                            //                     "Expiry Date : ${data.expiryDate}",
+                            //                     style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 5.sp),
+                            //                   ),
+                            //                   Text(
+                            //                     "Note : ${data.note.isNotEmpty ? data.note : "N/A"}",
+                            //                     style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 5.sp),
+                            //                   ),
+                            //                   Text(
+                            //                     "Reason : ${data.reason.isNotEmpty ? data.reason : "N/A"}",
+                            //                     style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 5.sp),
+                            //                   ),
+                            //                 ],
+                            //               ),
+                            //             ),
+                            //           ),
+                            //           Positioned(
+                            //             right: 5,
+                            //             top: 5,
+                            //             child: CornerBanner(
+                            //               bannerPosition:
+                            //                   CornerBannerPosition.topRight,
+                            //               bannerColor:
+                            //                   Colors.black.withOpacity(0.8),
+                            //               child: Text(
+                            //                 data.reqStatus,
+                            //                 style: TextStyle(
+                            //                     color: Colors.white,
+                            //                     fontSize: 5.sp),
+                            //               ),
+                            //             ),
+                            //           )
+                            //         ],
+                            //       );
+                            //     });
                           }
                         }))
               ],
