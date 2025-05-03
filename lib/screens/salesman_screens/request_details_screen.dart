@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -614,7 +615,11 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    showCommentPopup(context);
+                    log('req id: ${widget.requestId}, pro id: ${product.productId},pro name: ${product.name} ');
+                    showCommentPopup(context,
+                        requestID: int.parse(widget.requestId.toString()),
+                        productID: int.parse(product.productId),
+                        productName: product.name);
                   },
                   icon: Icon(Icons.message),
                 ),
