@@ -195,6 +195,20 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
           centerTitle: true,
           actions: [
             Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Image.asset(
+                'assets/excel_icon.png',
+              ),
+            ),
+            // Icon(
+            //   Icons.download,
+            //   color: Colors.white,
+            //   size: 8.sp,
+            // ),
+            SizedBox(
+              width: 5.sp,
+            ),
+            Padding(
               padding: EdgeInsets.only(right: 15),
               child: GestureDetector(
                 onTap: () {

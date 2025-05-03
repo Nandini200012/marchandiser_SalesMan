@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -525,8 +527,14 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                                           ),
                                                           IconButton(
                                                             onPressed: () {
+                                                              log('home: $requesId, ');
                                                               showCommentPopup(
-                                                                  context);
+                                                                  context,
+                                                                  requestID:
+                                                                      requesId,
+                                                                  productID: -1,
+                                                                  productName:
+                                                                      'null');
                                                             },
                                                             icon: Icon(
                                                                 Icons.message),
