@@ -1,7 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:faker/faker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:marchandise/services/comment/export_excel/export_excel_api.dart';
+import 'package:marchandise/utils/export_function.dart';
+import 'package:open_file/open_file.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:flutter/material.dart' as flutterMaterial;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -195,10 +201,87 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
           ),
           centerTitle: true,
           actions: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Image.asset(
-                'assets/excel_icon.png',
+            GestureDetector(
+              onTap: () async {
+                // Show a loading indicator (or message) when the export process starts
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Downloading export data...')),
+                );
+
+                final data = await fetchExportData(
+                  fromDate: DateFormat('yyyy-mm-dd')
+                      .format(_selectedFromDate)
+                      .toString(),
+                  toDate: DateFormat('yyyy-mm-dd')
+                      .format(_selectedToDate)
+                      .toString(),
+                ); // Your method returning ExportModel
+
+                if (data != null && data.isSuccess) {
+                  try {
+                    log('excel export data:${data.data.first}');
+                    // Call your export function and get the file path
+                    final filePath = await exportToExcel(
+                        data); // Export function you already have
+
+                    if (filePath != null) {
+                      // Notify the user that the export is successful and the file is ready
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Exported ${data.data.length} records to Excel!'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+
+                      if (kIsWeb) {
+                        // Web: Trigger browser download and open it in the tab
+                        final blob =
+                            html.Blob([File(filePath).readAsBytesSync()]);
+                        final url = html.Url.createObjectUrlFromBlob(blob);
+                        final anchor = html.AnchorElement(href: url)
+                          ..target = 'blank' // Opens the download in a new tab
+                          ..setAttribute('download', 'exported_data.xlsx')
+                          ..click();
+                        html.Url.revokeObjectUrl(url);
+
+                        // Optionally, you can open the file in a new tab directly
+                        html.window.open(url, '_blank');
+                      } else {
+                        // Mobile: Open the file after saving
+                        final result = await OpenFile.open(filePath);
+                        if (result.type != ResultType.done) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to open the file.')),
+                          );
+                        }
+                      }
+                    } else {
+                      // If the file path is invalid or the file doesn't exist, show an error
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to open the file.')),
+                      );
+                    }
+                  } catch (e) {
+                    // If any error occurs during export
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('An error occurred: $e')),
+                    );
+                  }
+                } else {
+                  // If the fetch failed, show an error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            'Failed to fetch export data. Please try again.')),
+                  );
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  'assets/excel_icon.png',
+                ),
               ),
             ),
             // Icon(

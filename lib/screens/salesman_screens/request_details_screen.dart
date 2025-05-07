@@ -179,6 +179,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   }
 
   void updateRequest() async {
+    log('--------->>>>>>. innnn');
     try {
       EasyLoading.show(
         status: 'Please wait...',
@@ -200,7 +201,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       }
       // Debug print for splitDetailsList
       print("Split Details List: $splitDetailsList");
-      print("Details List: $detailsList");
+      log("Details List: $detailsList");
 
       var headers = {
         'Content-Type': 'application/json',
@@ -217,7 +218,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
       // Convert requestBody to JSON string and print it
       var requestBodyJson = jsonEncode(requestBody);
-      print("Request Body JSON: $requestBodyJson");
+      log("Request Body JSON: $requestBodyJson");
 
       var response = await http.post(
         apiUrl,
@@ -401,7 +402,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         crossAxisSpacing: 10,
         mainAxisSpacing: 20,
         childAspectRatio:
-            constraints.maxWidth > 600 ? 2.5 : 1.5, // Adjust this for card size
+            constraints.maxWidth > 600 ? 2 : 1.5, // Adjust this for card size
       ),
       itemCount: products.length,
       itemBuilder: (context, index) {
@@ -482,18 +483,13 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                               height: constraints.maxWidth > 600
                                   ? 4.h
                                   : 2.h), // Reduced gap between lines
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'ItemCode : ${product.productId.toString()}',
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                              Text(
-                                'Exp Date : ${_formattedExpiryDate(product.expiryDate)}',
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                            ],
+                          Text(
+                            'ItemCode : ${product.productId.toString()}',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          Text(
+                            'Exp Date : ${_formattedExpiryDate(product.expiryDate)}',
+                            style: TextStyle(color: Colors.grey[700]),
                           ),
                           SizedBox(
                               height: constraints.maxWidth > 600
@@ -902,7 +898,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           padding: EdgeInsets.symmetric(vertical: 16.0),
         ),
         child: Text(
-          'Save',
+          'Save ',
           style: TextStyle(color: Colors.black, fontSize: 5.sp),
         ),
       ),
@@ -1420,6 +1416,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           "Id": product.itemID,
           "SiNo": product.siNo,
           "Qty": product.qty,
+          "Price": product.cost,
           "Banding": product.status == 'Banding' ? true : false,
           "Discount": product.status == 'Discount' ? true : false,
           "Return": product.status == 'Return' ? true : false,
@@ -1436,7 +1433,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         });
       }
     }
-    print("DetailsList: $detailsList");
+    log("------->>>>>>  DetailsList: $detailsList");
   }
 
   List<Map<String, dynamic>> getSplitDetailsMapsByItemId(
@@ -1679,7 +1676,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   onPressed: () {
                     double? enteredPrice =
                         double.tryParse(_priceController.text);
-
+                    log('before: Price updated to $enteredPrice for product ${product.cost}');
                     if (enteredPrice == null || enteredPrice <= 0) {
                       setStateDialog(() {
                         errorMessage = 'Price must be greater than zero';
@@ -1696,6 +1693,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                         product.cost = enteredPrice;
                         createDataList(); // Update the data list when price changes
                       });
+                      log('after: Price updated to $enteredPrice for product ${product.cost}');
                     }
                   },
                 ),
