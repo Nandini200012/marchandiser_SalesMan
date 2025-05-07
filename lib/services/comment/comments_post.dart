@@ -7,9 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> addComment(
   BuildContext context,
   int requestID,
-  int productID,
+  String productID,
   String productName,
   String comment,
+  dynamic uomID,
 ) async {
   final url =
       Uri.parse('https://marchandising.azurewebsites.net/api/addComment');
@@ -30,7 +31,8 @@ Future<void> addComment(
     "productID": productID,
     // "userName": username ?? 'Unknown',
     "productName": productName,
-    "comments": comment
+    "comments": comment,
+    "uomID": uomID,
   });
 
   log('Request Headers: $headers');

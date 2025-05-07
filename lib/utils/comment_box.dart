@@ -9,8 +9,9 @@ import 'package:marchandise/services/comment/comments_post.dart';
 void showCommentPopup(
   BuildContext context, {
   required int? requestID,
-  required int? productID,
+  required String? productID,
   required String? productName,
+  int? uomID,
 }) {
   List<CommentData> comments = [];
 
@@ -28,6 +29,7 @@ void showCommentPopup(
               'accept': '*/*',
               'requestId': requestID.toString(),
               'productId': productID.toString(),
+              'uomID': uomID.toString(),
             };
             log('get header:$headers');
             try {
@@ -81,6 +83,7 @@ void showCommentPopup(
                             productID!,
                             productName!,
                             commentText,
+                            uomID,
                           );
                           Navigator.pop(context);
                           fetchComments();

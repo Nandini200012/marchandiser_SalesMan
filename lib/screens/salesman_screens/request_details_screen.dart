@@ -53,6 +53,7 @@ class Product {
   dynamic itemID;
   dynamic QtysplitSiNo;
   dynamic requestID;
+  dynamic uomID;
   bool isValid = true;
 
   Product(this.name, this.productId, this.status,
@@ -70,7 +71,8 @@ class Product {
       this.discountPercentage = 0.0,
       this.itemID,
       this.QtysplitSiNo,
-      this.requestID});
+      this.requestID,
+      this.uomID = 0});
 }
 
 class RequestDetailsScreen extends StatefulWidget {
@@ -147,16 +149,21 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
       setState(() {
         products = salesmanData.data.map((datum) {
-          return Product(datum.prdouctName, datum.prdouctId, datum.status,
-              editingDiscount: true,
-              siNo: datum.siNo,
-              uom: datum.uom,
-              expiryDate: datum.date,
-              cost: datum.cost,
-              qty: datum.qty,
-              reason: datum.reason,
-              notes: datum.notes,
-              itemID: datum.itemID);
+          return Product(
+            datum.prdouctName,
+            datum.prdouctId,
+            datum.status,
+            editingDiscount: true,
+            siNo: datum.siNo,
+            uom: datum.uom,
+            expiryDate: datum.date,
+            cost: datum.cost,
+            qty: datum.qty,
+            reason: datum.reason,
+            notes: datum.notes,
+            itemID: datum.itemID,
+            uomID: datum.uomID,
+          );
         }).toList();
       });
     } catch (e) {
@@ -268,7 +275,9 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     // Iterate through the products to validate them
     setState(() {
       for (var product in products) {
-        if (product.status == "Initial" || product.status.isEmpty) {
+        if (product.status == "Initial" ||
+            product.status.isEmpty ||
+            product.cost == 0) {
           product.isValid = false; // Mark product as invalid
           allProductsUpdated = false;
         } else {
@@ -618,8 +627,9 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                     log('req id: ${widget.requestId}, pro id: ${product.productId},pro name: ${product.name} ');
                     showCommentPopup(context,
                         requestID: int.parse(widget.requestId.toString()),
-                        productID: int.parse(product.productId),
-                        productName: product.name);
+                        productID: product.productId,
+                        productName: product.name,
+                        uomID: product.uomID);
                   },
                   icon: Icon(Icons.message),
                 ),

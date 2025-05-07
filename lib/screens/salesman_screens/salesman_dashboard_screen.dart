@@ -35,7 +35,7 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
   Data? reportListData;
   Status selectedStatus = Status.banding;
   late Willpop willpop;
-  DateTime _selectedFromDate = DateTime.now();
+  DateTime _selectedFromDate = DateTime.now().subtract(Duration(days: 6));
   DateTime _selectedToDate = DateTime.now();
 
 // new
@@ -69,6 +69,8 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
         reportListMode: "SM",
         filterMode: filterMode,
         pageNo: 1,
+        vendorId: selectedVendorID,
+        salesPersonId: selectedSalesPersonID,
       );
 
       setState(() {
@@ -143,11 +145,11 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
   // }
 
   Future<void> fetchVendors({String query = '', int page = 1}) async {
-    if (isLoading) return;
+    // if (isLoading) return;
 
-    setState(() {
-      isLoading = true;
-    });
+    // setState(() {
+    //   isLoading = true;
+    // });
 
     try {
       final newVendors = await merchandiserapiService.fetchVendors(
@@ -164,9 +166,8 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
         currentPage = page;
       });
     } catch (error) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $error')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $error')));
     } finally {
       setState(() {
         isLoading = false;
@@ -333,12 +334,13 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
                                         : IconButton(
                                             icon: Icon(Icons.close),
                                             onPressed: () {
-                                              setState(() {
-                                                vendorController.clear();
-                                                selectedVendor = null;
-                                                selectedVendorID = null;
-                                                // _refreshCurrentTab();
-                                              });
+                                              selectedVendor = null;
+                                              selectedVendorID = null;
+                                              vendorController.clear();
+
+                                              setState(() {}); // Refresh UI
+                                              fetchData(getFilterModeFromStatus(
+                                                  selectedStatus)); // 🔄 Re-fetch data without vendor filter
                                             },
                                           ),
                                     filled: true,
@@ -346,10 +348,8 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
                                   ),
                                 ),
                                 suggestionsCallback: (pattern) {
-                                  return vendorList.where((vendor) => vendor
-                                      .vendorName
-                                      .toLowerCase()
-                                      .contains(pattern.toLowerCase()));
+                                  fetchVendors(query: pattern, page: 1);
+                                  return vendorList;
                                 },
                                 itemBuilder: (context, Vendors suggestion) {
                                   return ListTile(
@@ -358,13 +358,13 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
                                   );
                                 },
                                 onSuggestionSelected: (Vendors suggestion) {
-                                  setState(() {
-                                    selectedVendor = suggestion.vendorName;
-                                    selectedVendorID = suggestion.vendorId;
-                                    vendorController.text =
-                                        suggestion.vendorName;
-                                    // _refreshCurrentTab();
-                                  });
+                                  selectedVendor = suggestion.vendorName;
+                                  selectedVendorID = suggestion.vendorId;
+                                  vendorController.text = suggestion.vendorName;
+
+                                  setState(() {}); // Refresh UI
+                                  fetchData(getFilterModeFromStatus(
+                                      selectedStatus)); // ✅ Refetch data with updated filters
                                 },
                                 noItemsFoundBuilder: (context) => Padding(
                                   padding: EdgeInsets.all(8.0),
@@ -387,20 +387,21 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    suffixIcon: salesPersonController
-                                            .text.isEmpty
-                                        ? Icon(Icons.search)
-                                        : IconButton(
-                                            icon: Icon(Icons.close),
-                                            onPressed: () {
-                                              setState(() {
-                                                salesPersonController.clear();
-                                                selectedSalesPerson = null;
-                                                selectedSalesPersonID = null;
-                                                // _refreshCurrentTab();
-                                              });
-                                            },
-                                          ),
+                                    suffixIcon:
+                                        salesPersonController.text.isEmpty
+                                            ? Icon(Icons.search)
+                                            : IconButton(
+                                                icon: Icon(Icons.close),
+                                                onPressed: () {
+                                                  selectedSalesPerson = null;
+                                                  selectedSalesPersonID = null;
+                                                  salesPersonController.clear();
+
+                                                  setState(() {}); // Refresh UI
+                                                  fetchData(getFilterModeFromStatus(
+                                                      selectedStatus)); // 🔄 Re-fetch data without salesperson filter
+                                                },
+                                              ),
                                     filled: true,
                                     fillColor: Colors.white,
                                   ),
@@ -419,15 +420,16 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
                                 },
                                 onSuggestionSelected:
                                     (Map<String, dynamic> suggestion) {
-                                  setState(() {
-                                    selectedSalesPerson =
-                                        suggestion['salesPersonName'];
-                                    selectedSalesPersonID =
-                                        suggestion['salesPersonID'];
-                                    salesPersonController.text =
-                                        suggestion['salesPersonName'];
-                                    // _refreshCurrentTab();
-                                  });
+                                  selectedSalesPerson =
+                                      suggestion['salesPersonName'];
+                                  selectedSalesPersonID =
+                                      suggestion['salesPersonID'];
+                                  salesPersonController.text =
+                                      suggestion['salesPersonName'];
+
+                                  setState(() {}); // Refresh UI
+                                  fetchData(getFilterModeFromStatus(
+                                      selectedStatus)); // ✅ Refetch data with filters
                                 },
                                 noItemsFoundBuilder: (context) => Padding(
                                   padding: EdgeInsets.all(8.0),
@@ -623,6 +625,19 @@ class _SalesmanDashboardScreenState extends State<SalesmanDashboardScreen> {
         ),
       ),
     );
+  }
+
+  String getFilterModeFromStatus(Status status) {
+    switch (status) {
+      case Status.banding:
+        return "B";
+      case Status.discount:
+        return "D";
+      case Status.returning:
+        return "R";
+      default:
+        return "B";
+    }
   }
 
   Future<DateTime?> _selectDate(

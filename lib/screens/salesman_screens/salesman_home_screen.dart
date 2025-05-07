@@ -532,7 +532,8 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                                                   context,
                                                                   requestID:
                                                                       requesId,
-                                                                  productID: -1,
+                                                                  productID:
+                                                                      "-1",
                                                                   productName:
                                                                       'null');
                                                             },

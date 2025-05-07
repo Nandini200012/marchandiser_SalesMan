@@ -29,10 +29,10 @@ class SalesmanRequestById {
       );
 
   Map<String, dynamic> toJson() => {
-    "isSuccess": isSuccess,
-    "message": message,
-    "data": List<dynamic>.from(data.map((x) => x.toJson())),
-  };
+        "isSuccess": isSuccess,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+      };
 }
 
 class Datum {
@@ -47,6 +47,7 @@ class Datum {
   String reason;
   String notes;
   dynamic itemID;
+  dynamic uomID;
 
   Datum({
     required this.prdouctId,
@@ -60,36 +61,36 @@ class Datum {
     required this.reason,
     required this.notes,
     required this.itemID,
-
+    required this.uomID,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-    prdouctId: json["prdouctID"],
-    prdouctName: json["prdouctName"],
-    siNo: json["siNo"],
-    qty: json["qty"],
-    date: json["date"],
-    status: json["status"],
-    uom: json["UOM"],
-    cost: json["Cost"],
-    reason: json["reason"] ?? "N/A",
-    notes: json["notes"] ?? "N/A",
-    itemID: json["itemID"],
-
-  );
+        prdouctId: json["prdouctID"],
+        prdouctName: json["prdouctName"],
+        siNo: json["siNo"],
+        qty: json["qty"],
+        date: json["date"],
+        status: json["status"],
+        uom: json["UOM"],
+        cost: json["Cost"],
+        reason: json["reason"] ?? "N/A",
+        notes: json["notes"] ?? "N/A",
+        itemID: json["itemID"],
+        uomID: json["uomID"] ?? "0",
+      );
 
   Map<String, dynamic> toJson() => {
-    "prdouctID": prdouctId,
-    "prdouctName": prdouctName,
-    "siNo": siNo,
-    "qty": qty,
-    "date": date,
-    "status": status,
-    "UOM": uom,
-    "Cost": cost,
-    "reason": reason ?? "N/A",
-    "notes": notes ?? "N/A",
-    "itemID": itemID,
-
-  };
+        "prdouctID": prdouctId,
+        "prdouctName": prdouctName,
+        "siNo": siNo,
+        "qty": qty,
+        "date": date,
+        "status": status,
+        "UOM": uom,
+        "Cost": cost,
+        "reason": reason ?? "N/A",
+        "notes": notes ?? "N/A",
+        "itemID": itemID,
+        "uomID": uomID ?? "0",
+      };
 }

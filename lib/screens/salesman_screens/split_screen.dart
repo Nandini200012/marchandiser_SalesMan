@@ -409,6 +409,20 @@ class _SplitScreenState extends State<SplitScreen> {
       return;
     }
 
+    if (_splitStatus == 'Discount' &&
+        _splitDiscountMode == DiscountMode.percentage &&
+        (discountValue == 0)) {
+      _showError('Discount percentage cannot be zero.');
+      return;
+    }
+
+    if (_splitStatus == 'Discount' &&
+        _splitDiscountMode == DiscountMode.amount &&
+        (discountValue == 0)) {
+      _showError('Discount amount  cannot be zero.');
+      return;
+    }
+
     double discountAmount = _splitDiscountMode == DiscountMode.percentage
         ? (widget.product.cost ?? 0) * (discountValue / 100)
         : discountValue;

@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
+
 CommentModel commentModelFromJson(String str) =>
     CommentModel.fromJson(json.decode(str));
 
@@ -38,7 +40,7 @@ class CommentData {
   int commentId;
   int requestId;
   String userId;
-  int productId;
+  String productId;
   String productName;
   String comments;
   DateTime createdDateTime;

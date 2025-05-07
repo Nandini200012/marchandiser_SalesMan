@@ -58,13 +58,14 @@ class ManagerApiService {
   }
 
   ///Report List
-  Future<ReportListModel> getReportList({
-    required String fromDate,
-    required String toDate,
-    required String reportListMode,
-    required String filterMode,
-    required int pageNo,
-  }) async {
+  Future<ReportListModel> getReportList(
+      {required String fromDate,
+      required String toDate,
+      required String reportListMode,
+      required String filterMode,
+      required int pageNo,
+      int? vendorId,
+      int? salesPersonId}) async {
     final apiUrl = Uri.parse(Urls.reporList);
 
     Map<String, String> headers = {
@@ -75,6 +76,9 @@ class ManagerApiService {
       "ReportListMode": reportListMode.toString(),
       "FilterMode": filterMode.toString(),
       "PageNo": pageNo.toString(),
+      if (vendorId != null) 'selectedCustomer': vendorId.toString(),
+      if (salesPersonId != null)
+        'selectedSalesPerson': salesPersonId.toString(),
     };
     print("Print Header:$headers");
     try {
