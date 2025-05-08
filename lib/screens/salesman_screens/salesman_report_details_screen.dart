@@ -80,7 +80,7 @@ class _SalesManReportDetailsScreenState
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFFFFF9C4),
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Text(
@@ -148,7 +148,7 @@ class _SalesManReportDetailsScreenState
                                             crossAxisCount: 3,
                                             crossAxisSpacing: 8.0,
                                             mainAxisSpacing: 8.0,
-                                            childAspectRatio: 5 / 2.4),
+                                            childAspectRatio: 5 / 3),
                                     itemCount:
                                         reportDetailsListModel.data.length ?? 0,
                                     itemBuilder: (context, index) {
@@ -166,9 +166,12 @@ class _SalesManReportDetailsScreenState
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
                                                   children: [
                                                     Text(
-                                                      "ItemCode : ${data.prdouctId}",
+                                                      "BarCode : ${data.prdouctId}",
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
@@ -255,22 +258,48 @@ class _SalesManReportDetailsScreenState
                                             ),
                                           ),
                                           Positioned(
-                                            right: 5,
-                                            top: 5,
-                                            child: CornerBanner(
-                                              bannerPosition:
-                                                  CornerBannerPosition.topRight,
-                                              bannerColor:
-                                                  Colors.black.withOpacity(0.8),
+                                            top: 0,
+                                            right: 0,
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.blueAccent,
+                                                borderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(8),
+                                                  bottomLeft:
+                                                      Radius.circular(8),
+                                                ),
+                                              ),
                                               child: Text(
-                                                data.reqStatus,
+                                                data.reqStatus ??
+                                                    '', // Dynamic status display
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 5.sp,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                             ),
-                                          )
+                                          ),
+
+                                          // Positioned(
+                                          //   right: 5,
+                                          //   top: 5,
+                                          //   child: CornerBanner(
+                                          //     bannerPosition:
+                                          //         CornerBannerPosition.topRight,
+                                          //     bannerColor:
+                                          //         Colors.black.withOpacity(0.8),
+                                          //     child: Text(
+                                          //       data.reqStatus,
+                                          //       style: TextStyle(
+                                          //         color: Colors.white,
+                                          //         fontSize: 5.sp,
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // )
                                         ],
                                       );
                                     },
