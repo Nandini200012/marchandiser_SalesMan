@@ -1,3 +1,5 @@
+// ignore_for_file: sort_child_properties_last
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -37,7 +39,7 @@ class _SplitScreenState extends State<SplitScreen> {
   dynamic totalSplitQty = 0;
   dynamic availableQty = 0;
   String? _discountErrorMessage;
-
+  double discountAmount = 0.00, discountPercentage = 0.00;
   @override
   void initState() {
     super.initState();
@@ -83,10 +85,10 @@ class _SplitScreenState extends State<SplitScreen> {
       onWillPop: _onBackPressed,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Split Quantity'),
+          title: const Text('Split Quantity'),
           backgroundColor: widget.screenMode == 'SalesMan'
-              ? Color(0xFFFFF9C4)
-              : Color.fromARGB(255, 207, 68, 18),
+              ? const Color(0xFFFFF9C4)
+              : const Color.fromARGB(255, 207, 68, 18),
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -144,7 +146,7 @@ class _SplitScreenState extends State<SplitScreen> {
                           SizedBox(height: 16.h),
                           TextField(
                             controller: _splitQtyController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Enter split quantity',
                               border: OutlineInputBorder(),
                             ),
@@ -209,7 +211,7 @@ class _SplitScreenState extends State<SplitScreen> {
                                             DiscountMode.percentage
                                         ? 'Enter Discount %'
                                         : 'Enter Discount Amount',
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
                                   ),
                                   keyboardType: TextInputType.number,
                                   style: TextStyle(
@@ -223,8 +225,8 @@ class _SplitScreenState extends State<SplitScreen> {
                           Center(
                             child: FloatingActionButton(
                               onPressed: _handleAddSplit,
-                              child: Icon(Icons.add, color: Colors.white),
-                              backgroundColor: Color(0xFFFBC02D),
+                              child: const Icon(Icons.add, color: Colors.white),
+                              backgroundColor: const Color(0xFFFBC02D),
                             ),
                           ),
                         ],
@@ -255,16 +257,29 @@ class _SplitScreenState extends State<SplitScreen> {
                                       : 12.sp),
                             ),
                             subtitle: split.splitStatus == 'Discount'
-                                ? Text(
-                                    '${split.discountMode == DiscountMode.percentage ? 'Discount Percentage: ${split.discountPercentage.toStringAsFixed(3)}%' : 'Discount Amount: ${split.discountAmount.toStringAsFixed(3)}'}',
-                                    style: TextStyle(
-                                        fontSize: constraints.maxWidth > 600
-                                            ? 6.sp
-                                            : 10.sp),
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${split.discountMode == DiscountMode.percentage ? 'Disc Percentage: ${split.discountPercentage.toStringAsFixed(3)}%' : 'Disc Amount: ${split.discountAmount.toStringAsFixed(3)}'}',
+                                        style: TextStyle(
+                                            fontSize: constraints.maxWidth > 600
+                                                ? 6.sp
+                                                : 10.sp),
+                                      ),
+                                      Text(
+                                        '${split.discountMode == DiscountMode.percentage ? 'Disc Amount: ${discountAmount.toStringAsFixed(3)}' : 'Disc Percentage: ${discountPercentage.toStringAsFixed(3)}%'}',
+                                        style: TextStyle(
+                                            fontSize: constraints.maxWidth > 600
+                                                ? 6.sp
+                                                : 10.sp),
+                                      ),
+                                    ],
                                   )
                                 : null,
                             trailing: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
+                              icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => _removeSplit(index),
                             ),
                           ),
@@ -288,7 +303,7 @@ class _SplitScreenState extends State<SplitScreen> {
                         color: Colors.black,
                         fontSize: constraints.maxWidth > 600 ? 6.sp : 12.sp)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFBC02D),
+                  backgroundColor: const Color(0xFFFBC02D),
                   padding: EdgeInsets.symmetric(
                       vertical: constraints.maxWidth > 600 ? 8.0 : 16.0),
                   shape: RoundedRectangleBorder(
@@ -423,14 +438,14 @@ class _SplitScreenState extends State<SplitScreen> {
       return;
     }
 
-    double discountAmount = _splitDiscountMode == DiscountMode.percentage
-        ? (widget.product.cost ?? 0) * (discountValue / 100)
-        : discountValue;
-    double discountPercentage = _splitDiscountMode == DiscountMode.percentage
-        ? discountValue
-        : (discountValue / (widget.product.cost ?? 1)) * 100;
-
     setState(() {
+      discountAmount = _splitDiscountMode == DiscountMode.percentage
+          ? (widget.product.cost ?? 0) * (discountValue / 100)
+          : discountValue;
+      discountPercentage = _splitDiscountMode == DiscountMode.percentage
+          ? discountValue
+          : (discountValue / (widget.product.cost ?? 1)) * 100;
+
       splitDetails.add(SplitDetail(
         widget.product.itemID,
         widget.product.siNo,
@@ -505,11 +520,11 @@ class _SplitScreenState extends State<SplitScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Error'),
+          title: const Text('Error'),
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -534,14 +549,14 @@ class _SplitScreenState extends State<SplitScreen> {
       bool? exitConfirmed = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Exit without saving?'),
-          content: Text('No split quantity found. Do you want to exit?'),
+          title: const Text('Exit without saving?'),
+          content: const Text('No split quantity found. Do you want to exit?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false); // Cancel exit
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
@@ -549,7 +564,7 @@ class _SplitScreenState extends State<SplitScreen> {
                     ''; // Revert the product status to empty
                 Navigator.of(context).pop(true); // Confirm exit
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
           ],
         ),

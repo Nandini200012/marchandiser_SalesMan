@@ -4,6 +4,8 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:marchandise/provider/split_provider.dart';
 import 'package:marchandise/screens/model/comment_model.dart';
 import 'package:marchandise/screens/salesman_screens/api_service/salesman_api_service.dart';
@@ -292,7 +294,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         message: 'Please select at least one product to update.',
         backgroundColor: Colors.red,
         flushbarPosition: FlushbarPosition.TOP,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ).show(context);
     } else if (!allProductsUpdated) {
       // Show error message with the list of products that are not updated
@@ -301,7 +303,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         message: 'Please update the status for the highlighted products.',
         backgroundColor: Colors.red,
         flushbarPosition: FlushbarPosition.TOP,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ).show(context);
     } else {
       _showUpdateDialog();
@@ -310,7 +312,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.init(context, designSize: Size(375, 812));
+    ScreenUtil.init(context, designSize: const Size(375, 812));
     return WillPopScope(
       onWillPop: () async => _onBackPressed(),
       child: Scaffold(
@@ -355,7 +357,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
 
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: Color(0xFFFFF9C4),
+      backgroundColor: Colors.white,
+      // const Color(0xFFFFF9C4),
       leading: IconButton(
         onPressed: () async {
           bool shouldExit = await _onBackPressed(); // ✅
@@ -381,17 +384,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         onTap: () {
           DynamicAlertBox().logOut(context, "Do you Want to Logout", () {
             Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => SplashScreen()));
+                MaterialPageRoute(builder: (context) => const SplashScreen()));
           });
         },
-        child: CircleAvatar(radius: 22, child: Text("SM")),
+        child: const CircleAvatar(radius: 22, child: Text("SM")),
       ),
     );
   }
 
   Widget _buildProductList(BoxConstraints constraints) {
     if (products.isEmpty) {
-      return Center(child: Text('No Requests available'));
+      return const Center(child: Text('No Requests available'));
     }
 
     return GridView.builder(
@@ -399,10 +402,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         crossAxisCount: constraints.maxWidth > 600
             ? 3
             : 1, // Display 2 cards in a row for web
-        crossAxisSpacing: 10,
+        crossAxisSpacing: 20,
         mainAxisSpacing: 20,
         childAspectRatio:
-            constraints.maxWidth > 600 ? 2 : 1.5, // Adjust this for card size
+            constraints.maxWidth > 600 ? 1.8 : 1.5, // Adjust this for card size
       ),
       itemCount: products.length,
       itemBuilder: (context, index) {
@@ -411,6 +414,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     );
   }
 
+// ----->>>>>original
   Widget _buildProductCard(Product product, BoxConstraints constraints) {
     return Card(
       color: product.isValid ? Colors.grey[100] : Colors.red[100],
@@ -433,138 +437,247 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       child: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.only(
-              left: constraints.maxWidth > 600
-                  ? 5.w
-                  : 6.w, // Reduced left padding
-              right: constraints.maxWidth > 600
-                  ? 5.w
-                  : 6.w, // Reduced right padding
-              top:
-                  constraints.maxWidth > 600 ? 8.h : 6.h, // Reduced top padding
-              bottom: constraints.maxWidth > 600
-                  ? 8.h
-                  : 6.h, // Reduced bottom padding
-            ),
+            padding: const EdgeInsets.all(2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // CircleAvatar(
-                    //   backgroundColor: Color(0xFFFBC02D),
-                    //   child: Text(
-                    //     product.name.substring(0, 1),
-                    //     style: TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: constraints.maxWidth > 600 ? 5.sp : 5.sp,
-                    //     ),
-                    //   ),
-                    // ),
-                    SizedBox(
-                        width: constraints.maxWidth > 600
-                            ? 8.w
-                            : 6.w), // Reduced gap between avatar and text
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            product.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Center(
+                              child: Text(
+                                product.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.black,
+                                  fontSize: 4.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                           SizedBox(
                               height: constraints.maxWidth > 600
                                   ? 4.h
                                   : 2.h), // Reduced gap between lines
-                          Text(
-                            'ItemCode : ${product.productId.toString()}',
-                            style: TextStyle(color: Colors.grey[700]),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 5.w,
+                              ),
+                              Container(
+                                width: 50.w,
+                                // height: 20.h,
+                                // color: Colors.red,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'BarCode',
+                                      style: GoogleFonts.roboto(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                        // fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      product.productId.toString(),
+                                      style: GoogleFonts.roboto(
+                                        color: Colors.black,
+                                        fontSize: 13,
+                                        // fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // const Spacer(),
+                              Container(
+                                width: 35.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _showEditPriceDialog(product);
+                                      },
+                                      child: Text(
+                                        'Cost',
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.blue,
+                                          fontSize: 12,
+                                          // fontWeight: FontWeight.w700,
+                                          // letterSpacing: 1
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _showEditPriceDialog(product);
+                                      },
+                                      child: Text(
+                                        '${NumberFormat.currency(locale: 'en_BH', symbol: '').format(product.cost)}',
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.blue,
+                                          fontSize: 13,
+                                          // fontWeight: FontWeight.w700,
+                                          // letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                // width: 50.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _showEditQuantityDialog(product);
+                                      },
+                                      child: Text(
+                                        'Qty',
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 12,
+                                          // fontWeight: FontWeight.w700,
+                                          // letterSpacing: 1
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _showEditQuantityDialog(product);
+                                      },
+                                      child: Text(
+                                        product.qty.toStringAsFixed(2),
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 13,
+                                          // fontWeight: FontWeight.w700,
+                                          // letterSpacing: 1
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            'Exp Date : ${_formattedExpiryDate(product.expiryDate)}',
-                            style: TextStyle(color: Colors.grey[700]),
+                          SizedBox(
+                              height: constraints.maxWidth > 600 ? 6.h : 2.h),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 5.w,
+                              ),
+                              Container(
+                                width: 50.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Exp Date',
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                        fontSize: 12,
+                                        // fontWeight: FontWeight.w700,
+                                        // letterSpacing: 1
+                                      ),
+                                    ),
+                                    Text(
+                                      _formattedExpiryDate(product.expiryDate),
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 13,
+                                        // fontWeight: FontWeight.w700,
+                                        // letterSpacing: 1
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // const Spacer(),
+                              Column(
+                                children: [
+                                  Text(
+                                    'Uom',
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 12,
+                                      // fontWeight: FontWeight.w700,
+                                      // letterSpacing: 1
+                                    ),
+                                  ),
+                                  Text(
+                                    product.uom.toString(),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 13,
+                                      // fontWeight: FontWeight.w700,
+                                      // letterSpacing: 1
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                           SizedBox(
                               height: constraints.maxWidth > 600
                                   ? 6.h
                                   : 2.h), // Reduced gap between rows
+
+                          // SizedBox(
+                          //     height: constraints.maxWidth > 600
+                          //         ? 6.h
+                          //         : 2.h), // Reduced gap between lines
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  _showEditQuantityDialog(product);
-                                },
-                                child: Text(
-                                  'Qty : ${product.qty.toString()}',
-                                  style: TextStyle(color: Colors.blue),
+                              SizedBox(
+                                width: 5.w,
+                              ),
+                              Container(
+                                width: 50.w,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Reason ',
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                        fontSize: 12,
+                                        // fontWeight: FontWeight.w700,
+                                        // letterSpacing: 1
+                                      ),
+                                    ),
+                                    Text(
+                                      '${product.reason}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 13,
+                                        // fontWeight: FontWeight.w700,
+                                        // letterSpacing: 1
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Text(
-                                'Unit : ${product.uom.toString()}',
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _showEditPriceDialog(product);
-                                },
-                                child: Text(
-                                  'Price : ${product.cost.toStringAsFixed(3)}',
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                              height: constraints.maxWidth > 600
-                                  ? 6.h
-                                  : 2.h), // Reduced gap between lines
-                          Text(
-                            'Reason : ${product.reason}',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                          SizedBox(
-                              height: constraints.maxWidth > 600
-                                  ? 6.h
-                                  : 2.h), // Reduced gap between lines
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Notes : ${product.notes}',
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                              Text(
-                                'Gross Total : ${_calculateGrossTotal(product).toStringAsFixed(3)}',
-                                style: TextStyle(color: Colors.grey[700]),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                              height: constraints.maxWidth > 600
-                                  ? 6.h
-                                  : 2.h), // Reduced gap between lines
-                          // Status and discount section
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Product Status
-                              Text(
-                                product.status,
-                                style: TextStyle(
-                                  color: _getStatusColor(product.status),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              // Discount Information (if applicable)
+                              // Spacer(),
                               if (!product.editingDiscount &&
                                   double.parse(product.discountValue.isNotEmpty
                                           ? product.discountValue
@@ -586,20 +699,119 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                                 : 2.h,
                                             horizontal:
                                                 constraints.maxWidth > 600
-                                                    ? 4.w
-                                                    : 4.w,
+                                                    ? 8.w
+                                                    : 8.w,
                                           ),
-                                          child: Text(
-                                            '${product.discountMode == DiscountMode.percentage ? 'Percentage' : 'Amount'}: ${double.parse(product.discountValue).toStringAsFixed(product.discountMode == DiscountMode.percentage ? 2 : 3)}',
-                                            style: TextStyle(
-                                              color: Colors.blue,
-                                            ),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                '${product.discountMode == DiscountMode.percentage ? 'Disc %' : 'Amount'}: ${double.parse(product.discountValue).toStringAsFixed(product.discountMode == DiscountMode.percentage ? 2 : 3)}',
+                                                style: const TextStyle(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${product.discountMode == DiscountMode.percentage ? 'Amount' : 'Disc %'}: ${product.discountMode == DiscountMode.percentage ? product.discountAmount.toStringAsFixed(3) : product.discountPercentage.toStringAsFixed(3)}',
+                                                style: const TextStyle(
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         );
                                       },
                                     ),
                                   ),
                                 ),
+                            ],
+                          ),
+                          SizedBox(
+                              height: constraints.maxWidth > 600
+                                  ? 6.h
+                                  : 2.h), // Reduced gap between lines
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 5.w,
+                              ),
+                              SizedBox(
+                                // height: 20.h,
+                                width: 60.w,
+                                child: Text(
+                                  'Notes : ${product.notes} ',
+                                  style: TextStyle(
+                                    color: Colors.grey[700],
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                              height: constraints.maxWidth > 600
+                                  ? 6.h
+                                  : 2.h), // Reduced gap between lines
+                          // Status and discount section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Product Status
+                              // Text(
+                              //   product.status,
+                              //   style: TextStyle(
+                              //     color: _getStatusColor(product.status),
+                              //     fontWeight: FontWeight.w600,
+                              //   ),
+                              // ),
+                              // Discount Information (if applicable)
+                              // if (!product.editingDiscount &&
+                              //     double.parse(product.discountValue.isNotEmpty
+                              //             ? product.discountValue
+                              //             : '0') >
+                              //         0)
+                              //   Padding(
+                              //     padding:
+                              //         const EdgeInsets.symmetric(vertical: 4.0),
+                              //     child: InkWell(
+                              //       onTap: () {
+                              //         _showDiscountDialog(product);
+                              //       },
+                              //       child: LayoutBuilder(
+                              //         builder: (context, constraints) {
+                              //           return Container(
+                              //             padding: EdgeInsets.symmetric(
+                              //               vertical: constraints.maxWidth > 600
+                              //                   ? 2.h
+                              //                   : 2.h,
+                              //               horizontal:
+                              //                   constraints.maxWidth > 600
+                              //                       ? 8.w
+                              //                       : 8.w,
+                              //             ),
+                              //             child: Column(
+                              //               children: [
+                              //                 Text(
+                              //                   '${product.discountMode == DiscountMode.percentage ? 'Disc %' : 'Amount'}: ${double.parse(product.discountValue).toStringAsFixed(product.discountMode == DiscountMode.percentage ? 2 : 3)}',
+                              //                   style: const TextStyle(
+                              //                     color: Colors.blue,
+                              //                   ),
+                              //                 ),
+                              //                 Text(
+                              //                   '${product.discountMode == DiscountMode.percentage ? 'Amount' : 'Disc %'}: ${product.discountMode == DiscountMode.percentage ? product.discountAmount.toStringAsFixed(3) : product.discountPercentage.toStringAsFixed(3)}',
+                              //                   style: const TextStyle(
+                              //                     color: Colors.black,
+                              //                   ),
+                              //                 ),
+                              //               ],
+                              //             ),
+                              //           );
+                              //         },
+                              //       ),
+                              //     ),
+                              //   ),
                             ],
                           ),
                         ],
@@ -611,138 +823,81 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
             ),
           ),
           Positioned(
-            bottom: 10
+            bottom: 8
                 .h, // Reduced the gap between the button and the bottom of the card
             left: 0,
-            right: 10,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    log('req id: ${widget.requestId}, pro id: ${product.productId},pro name: ${product.name} ');
-                    showCommentPopup(context,
-                        requestID: int.parse(widget.requestId.toString()),
-                        productID: product.productId,
-                        productName: product.name,
-                        uomID: product.uomID);
-                  },
-                  icon: Icon(Icons.message),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom:
-                10, // Reduced the gap between the button and the bottom of the card
-            left: 0,
             right: 0,
-            child: Align(
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                onPressed: () => _showUpdateOptions(product),
-                child: Text("Update"),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: const Color.fromARGB(255, 107, 95, 95),
-                  backgroundColor: Color(0xFFFBC02D),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            child: Container(
+              color: Colors.grey[200],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // SizedBox(
+                  //   width: 5.w,
+                  // ),
+                  Text(
+                    'Gross Total: ${NumberFormat.currency(locale: 'en_BH', symbol: '').format(_calculateGrossTotal(product))}',
+                    style: TextStyle(color: Colors.grey[700]),
                   ),
-                ),
+
+                  Text(
+                    product.status,
+                    style: TextStyle(
+                      color: _getStatusColor(product.status),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  // const Spacer(),
+                  ElevatedButton(
+                    onPressed: () => _showUpdateOptions(product),
+                    child: const Text("Update"),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: const Color.fromARGB(255, 107, 95, 95),
+                      backgroundColor: const Color(0xFFFBC02D),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      log('req id: ${widget.requestId}, pro id: ${product.productId},pro name: ${product.name} ');
+                      showCommentPopup(context,
+                          requestID: int.parse(widget.requestId.toString()),
+                          productID: product.productId,
+                          productName: product.name,
+                          uomID: product.uomID);
+                    },
+                    icon: const Icon(Icons.message),
+                  ),
+                ],
               ),
             ),
           ),
+          // Positioned(
+          //   bottom:
+          //       10, // Reduced the gap between the button and the bottom of the card
+          //   left: 0,
+          //   right: 20,
+          //   child: Align(
+          //     alignment: Alignment.centerRight,
+          //     child: ElevatedButton(
+          //       onPressed: () => _showUpdateOptions(product),
+          //       child: const Text("Update"),
+          //       style: ElevatedButton.styleFrom(
+          //         foregroundColor: const Color.fromARGB(255, 107, 95, 95),
+          //         backgroundColor: const Color(0xFFFBC02D),
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(8),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
   }
-
-  // void showCommentPopup(BuildContext context) {
-  //   List<String> comments = ['Nice post!', 'Interesting!', 'Well said!'];
-
-  //   void showAddCommentDialog() {
-  //     TextEditingController _commentController = TextEditingController();
-  //     showDialog(
-  //       context: context,
-  //       builder: (context) {
-  //         return AlertDialog(
-  //           title: Text('Add Comment'),
-  //           content: TextField(
-  //             controller: _commentController,
-  //             maxLines: 3,
-  //             decoration: InputDecoration(
-  //               hintText: 'Enter your comment',
-  //               border: OutlineInputBorder(),
-  //             ),
-  //           ),
-  //           actions: [
-  //             TextButton(
-  //               onPressed: () => Navigator.pop(context),
-  //               child: Text('Cancel'),
-  //             ),
-  //             ElevatedButton(
-  //               onPressed: () {
-  //                 if (_commentController.text.isNotEmpty) {
-  //                   comments.add(_commentController.text);
-  //                 }
-  //                 Navigator.pop(context);
-  //               },
-  //               child: Text('Submit'),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     );
-  //   }
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return AlertDialog(
-  //             title: Text('Comments'),
-  //             content: Container(
-  //               width: double.maxFinite,
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Expanded(
-  //                     child: ListView.builder(
-  //                       shrinkWrap: true,
-  //                       itemCount: comments.length,
-  //                       itemBuilder: (context, index) {
-  //                         return ListTile(
-  //                           leading: Icon(Icons.comment),
-  //                           title: Text(comments[index]),
-  //                         );
-  //                       },
-  //                     ),
-  //                   ),
-  //                   Align(
-  //                     alignment: Alignment.centerRight,
-  //                     child: IconButton(
-  //                       icon: Icon(Icons.add_comment),
-  //                       onPressed: () {
-  //                         showAddCommentDialog();
-  //                       },
-  //                     ),
-  //                   )
-  //                 ],
-  //               ),
-  //             ),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () => Navigator.pop(context),
-  //                 child: Text('Close'),
-  //               )
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 
   String _formattedExpiryDate(String expiryDateString) {
     try {
@@ -779,7 +934,6 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     double discountValue = product.discountValue.isNotEmpty
         ? double.parse(product.discountValue)
         : 0;
-
     if (product.discountMode == DiscountMode.percentage) {
       // If discount is in percentage, reduce the percentage from the price
       double discountAmount = price * (discountValue / 100);
@@ -802,7 +956,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
             String errorMessage = '';
 
             return AlertDialog(
-              title: Text('Edit Quantity'),
+              title: const Text('Edit Quantity'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -818,13 +972,13 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: Text('Save'),
+                  child: const Text('Save'),
                   onPressed: () {
                     int? enteredQty = int.tryParse(_qtyController.text);
 
@@ -834,7 +988,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                           message: 'Quantity must be greater than zero',
                           backgroundColor: Colors.red,
                           flushbarPosition: FlushbarPosition.TOP,
-                          duration: Duration(seconds: 3),
+                          duration: const Duration(seconds: 3),
                         ).show(context);
                       });
                     } else {
@@ -862,7 +1016,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               TextStyle(fontSize: constraints.maxWidth > 600 ? 6.sp : 12.sp)),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.black,
-        backgroundColor: Color(0xFFFBC02D),
+        backgroundColor: const Color(0xFFFBC02D),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -889,13 +1043,13 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   Widget _buildSaveButton() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       color: Colors.white,
       child: ElevatedButton(
         onPressed: _validateAndUpdateRequest,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFFBC02D),
-          padding: EdgeInsets.symmetric(vertical: 16.0),
+          backgroundColor: const Color(0xFFFBC02D),
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
         ),
         child: Text(
           'Save ',
@@ -914,12 +1068,12 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: Icon(Icons.add, color: Color(0xFFFBC02D)),
+                  leading: const Icon(Icons.add, color: Color(0xFFFBC02D)),
                   title: Text("Banding", style: TextStyle(fontSize: 5.sp)),
                   onTap: () {
                     _updateProductStatus(MyButton.bandingButton, product);
@@ -927,7 +1081,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.local_offer, color: Color(0xFFFBC02D)),
+                  leading:
+                      const Icon(Icons.local_offer, color: Color(0xFFFBC02D)),
                   title: Text("Discount", style: TextStyle(fontSize: 5.sp)),
                   onTap: () {
                     setState(() {
@@ -940,7 +1095,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.reply, color: Color(0xFFFBC02D)),
+                  leading: const Icon(Icons.reply, color: Color(0xFFFBC02D)),
                   title: Text("Return", style: TextStyle(fontSize: 5.sp)),
                   onTap: () {
                     _updateProductStatus(MyButton.returnButton, product);
@@ -948,7 +1103,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.call_split, color: Color(0xFFFBC02D)),
+                  leading:
+                      const Icon(Icons.call_split, color: Color(0xFFFBC02D)),
                   title: Text("Split", style: TextStyle(fontSize: 5.sp)),
                   onTap: () {
                     _updateProductStatus(MyButton.splitButton, product);
@@ -972,7 +1128,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.cancel, color: Color(0xFFFBC02D)),
+                  leading: const Icon(Icons.cancel, color: Color(0xFFFBC02D)),
                   title: Text("No Actions", style: TextStyle(fontSize: 5.sp)),
                   onTap: () {
                     _updateProductStatus(MyButton.noActionButton, product);
@@ -1063,7 +1219,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                     'Discount percentage must be between 0 and 100',
                                 backgroundColor: Colors.red,
                                 flushbarPosition: FlushbarPosition.TOP,
-                                duration: Duration(seconds: 3),
+                                duration: const Duration(seconds: 3),
                               ).show(context);
                               setState(() {
                                 _discountController.clear();
@@ -1076,7 +1232,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                     'Discount amount cannot be greater than the product Price',
                                 backgroundColor: Colors.red,
                                 flushbarPosition: FlushbarPosition.TOP,
-                                duration: Duration(seconds: 3),
+                                duration: const Duration(seconds: 3),
                               ).show(context);
                               setState(() {
                                 _discountController.clear();
@@ -1114,7 +1270,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                             ),
                             hintText: '0.000',
                             suffixIcon: IconButton(
-                              icon: Icon(Icons.check, color: Colors.green),
+                              icon:
+                                  const Icon(Icons.check, color: Colors.green),
                               onPressed: () {
                                 double discount =
                                     double.tryParse(_discountController.text) ??
@@ -1127,7 +1284,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                         'Discount percentage must be between 0 and 100',
                                     backgroundColor: Colors.red,
                                     flushbarPosition: FlushbarPosition.TOP,
-                                    duration: Duration(seconds: 3),
+                                    duration: const Duration(seconds: 3),
                                   ).show(context);
                                   setState(() {
                                     _discountController.clear();
@@ -1142,7 +1299,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                         'Discount amount cannot be greater than the product Price',
                                     backgroundColor: Colors.red,
                                     flushbarPosition: FlushbarPosition.TOP,
-                                    duration: Duration(seconds: 3),
+                                    duration: const Duration(seconds: 3),
                                   ).show(context);
                                   setState(() {
                                     _discountController.clear();
@@ -1203,7 +1360,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(
+              child: const Text(
                 'No',
                 style: TextStyle(color: Colors.red), // Red for clarity
               ),
@@ -1220,7 +1377,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
               },
             ),
             TextButton(
-              child: Text(
+              child: const Text(
                 'Yes',
                 style: TextStyle(color: Colors.green), // Green for approval
               ),
@@ -1251,7 +1408,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       message: 'Please apply a discount percentage or amount first',
       backgroundColor: Colors.red,
       flushbarPosition: FlushbarPosition.TOP,
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
     ).show(context);
   }
 
@@ -1285,17 +1442,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Clear Split Quantity'),
-          content: Text('Do you want to clear the split quantity?'),
+          title: const Text('Clear Split Quantity'),
+          content: const Text('Do you want to clear the split quantity?'),
           actions: <Widget>[
             TextButton(
-              child: Text('No'),
+              child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Yes'),
+              child: const Text('Yes'),
               onPressed: () {
                 final splitProvider =
                     Provider.of<SplitProvider>(context, listen: false);
@@ -1455,7 +1612,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
       ),
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           height: 200.h,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1478,7 +1635,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFBC02D),
+                  backgroundColor: const Color(0xFFFBC02D),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -1532,12 +1689,13 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                           _refreshData();
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
-                                builder: (context) => SalesManBottomNavBar()),
+                                builder: (context) =>
+                                    const SalesManBottomNavBar()),
                             (route) => false,
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFBC02D),
+                          backgroundColor: const Color(0xFFFBC02D),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -1620,16 +1778,17 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
     return (await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Exit without saving?'),
-            content: Text('Are you sure you want to exit without saving?'),
+            title: const Text('Exit without saving?'),
+            content:
+                const Text('Are you sure you want to exit without saving?'),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false), // Block back
-                child: Text('No'),
+                child: const Text('No'),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true), // Allow back
-                child: Text('Yes'),
+                child: const Text('Yes'),
               ),
             ],
           ),
@@ -1649,7 +1808,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
             String errorMessage = '';
 
             return AlertDialog(
-              title: Text('Edit Price'),
+              title: const Text('Edit Price'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1660,19 +1819,19 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                       errorText: errorMessage.isNotEmpty ? errorMessage : null,
                     ),
                     keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                   ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
-                  child: Text('Save'),
+                  child: const Text('Save'),
                   onPressed: () {
                     double? enteredPrice =
                         double.tryParse(_priceController.text);
@@ -1685,7 +1844,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                         message: 'Price must be greater than zero',
                         backgroundColor: Colors.red,
                         flushbarPosition: FlushbarPosition.TOP,
-                        duration: Duration(seconds: 3),
+                        duration: const Duration(seconds: 3),
                       ).show(context);
                     } else {
                       Navigator.of(context).pop();
