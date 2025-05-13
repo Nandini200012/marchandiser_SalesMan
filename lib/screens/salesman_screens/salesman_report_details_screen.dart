@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:marchandise/screens/manager_screens/api_service/manager_api_service.dart';
 import 'package:marchandise/screens/manager_screens/model/report_details_list_model.dart';
 import 'package:marchandise/screens/salesman_screens/salesman_dashboard_screen.dart';
 import 'package:marchandise/utils/willpop.dart';
-import 'package:super_banners/super_banners.dart';
 
 class SalesManReportDetailsScreen extends StatefulWidget {
   final int requestId;
@@ -85,7 +85,7 @@ class _SalesManReportDetailsScreenState
           centerTitle: true,
           title: Text(
             widget.CustomerName,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
@@ -144,146 +144,511 @@ class _SalesManReportDetailsScreenState
                                 // gridview nandini changes
                                 : GridView.builder(
                                     gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3,
-                                            crossAxisSpacing: 8.0,
-                                            mainAxisSpacing: 8.0,
-                                            childAspectRatio: 5 / 3),
-                                    itemCount:
-                                        reportDetailsListModel.data.length ?? 0,
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      childAspectRatio: 1.4,
+                                      crossAxisSpacing: 20,
+                                      mainAxisSpacing: 20,
+                                    ),
+                                    itemCount: snapshot.data!.data.length,
                                     itemBuilder: (context, index) {
-                                      Datum data =
-                                          reportDetailsListModel.data[index];
-                                      return Stack(
-                                        children: [
-                                          Container(
-                                            width: double.infinity,
-                                            child: Card(
-                                              elevation: 4,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Text(
-                                                      "BarCode : ${data.prdouctId}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp,
-                                                      ),
+                                      final data = snapshot.data!.data[index];
+                                      return Card(
+                                        elevation: 2,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: getStatusColor(
+                                                        data.reqStatus)
+                                                    .withOpacity(0.3),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 12,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: getStatusColor(
+                                                            data.reqStatus)
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(12),
+                                                      topRight:
+                                                          Radius.circular(12),
                                                     ),
-                                                    Text(
-                                                      // 'dghjkesruejrfbj hjrbetmnsg berdmewrgs dfjghjsdbfjwejfhmehjv  iuweku  orkeqjewru oewihi',
-                                                      "Product Name : ${data.prdouctName}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "Quantity : ${data.quantity.toStringAsFixed(2)}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp,
-                                                      ),
-                                                    ),
-                                                    if (filterModeselection ==
-                                                        'D') ...[
-                                                      Text(
-                                                        "DiscMode : ${data.discMode}",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          fontSize: 5.sp,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Barcode: ${data.prdouctId}',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 4),
+                                                            Text(
+                                                              data.prdouctName,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 13,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
-                                                      // Show percentage if mode is percentage
-                                                      if (data.discMode ==
-                                                          "Percentage")
-                                                        Text(
-                                                          "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
-                                                          style: TextStyle(
+                                                      const SizedBox(width: 8),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 4,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: getStatusColor(
+                                                              data.reqStatus),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(16),
+                                                        ),
+                                                        child: Text(
+                                                          data.reqStatus,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 12,
                                                             fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 5.sp,
+                                                                FontWeight.w500,
                                                           ),
                                                         ),
-                                                      // Show amount if mode is amount
-                                                      if (data.discMode ==
-                                                          "Amount")
-                                                        Text(
-                                                          "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize: 5.sp,
-                                                          ),
-                                                        ),
+                                                      ),
                                                     ],
-                                                    Text(
-                                                      "Expiry Date : ${data.expiryDate}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "Note : ${data.note.isNotEmpty ? data.note : "N/A"}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "Reason : ${data.reason.isNotEmpty ? data.reason : "N/A"}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 5.sp,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 0,
-                                            right: 0,
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.blueAccent,
-                                                borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(8),
-                                                  bottomLeft:
-                                                      Radius.circular(8),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                data.reqStatus ??
-                                                    '', // Dynamic status display
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                                Expanded(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons
+                                                                    .shopping_cart_outlined,
+                                                                'Quantity',
+                                                                data.quantity
+                                                                    .toStringAsFixed(
+                                                                        2),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 16),
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons
+                                                                    .calendar_today_outlined,
+                                                                'Expiry',
+                                                                data.expiryDate ??
+                                                                    'N/A',
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 16),
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons.balance,
+                                                                'UOM',
+                                                                data.uom ??
+                                                                    'N/A',
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        // if (data.DiscPerc > 0 ||
+                                                        // data.DiscAmount > 0)
+                                                        const Divider(
+                                                            height: 16),
+                                                        // if (data.DiscPerc > 0)
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons.money,
+                                                                'Cost',
+                                                                data.cost
+                                                                    .toStringAsFixed(
+                                                                        2),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons.percent,
+                                                                'Discount %',
+                                                                data.discPerc
+                                                                    .toStringAsFixed(
+                                                                        2),
+                                                              ),
+                                                            ),
+                                                            // if (data.DiscAmount > 0)
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons
+                                                                    .money_off_csred_outlined,
+                                                                'Discount Amt',
+                                                                data.discAmount
+                                                                    .toStringAsFixed(
+                                                                        3),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
 
-                                          // Positioned(
+                                                        // if (data.note.isNotEmpty ||
+                                                        // data.reason.isNotEmpty)
+                                                        const Divider(
+                                                            height: 16),
+                                                        // if (data.note.isNotEmpty)
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons
+                                                                    .info_outline,
+                                                                'Reason',
+                                                                data.reason
+                                                                        .isNotEmpty
+                                                                    ? data
+                                                                        .reason
+                                                                    : 'N/A',
+                                                              ),
+                                                            ),
+
+                                                            // if (data.reason.isNotEmpty)
+
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons
+                                                                    .calendar_month,
+                                                                'Expiry Date',
+                                                                formatSalesmanDate(data
+                                                                        .expiryDate
+                                                                        .toString()) ??
+                                                                    'N/A',
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const Divider(
+                                                            height: 16),
+                                                        // if (data.note.isNotEmpty)
+                                                        Row(
+                                                          children: [
+                                                            // if (data.reason.isNotEmpty)
+                                                            Expanded(
+                                                              child:
+                                                                  _buildInfoRow(
+                                                                Icons
+                                                                    .note_outlined,
+                                                                'Note',
+                                                                data.note
+                                                                        .isNotEmpty
+                                                                    ? data.note
+                                                                    : 'N/A',
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                            // : GridView.builder(
+                            //     gridDelegate:
+                            //         const SliverGridDelegateWithFixedCrossAxisCount(
+                            //             crossAxisCount: 3,
+                            //             crossAxisSpacing: 8.0,
+                            //             mainAxisSpacing: 8.0,
+                            //             childAspectRatio: 5 / 3),
+                            //     itemCount:
+                            //         reportDetailsListModel.data.length ?? 0,
+                            //     itemBuilder: (context, index) {
+                            //       Datum data =
+                            //           reportDetailsListModel.data[index];
+                            //       return Stack(
+                            //         children: [
+                            //           Container(
+                            //             width: double.infinity,
+                            //             child: Card(
+                            //               elevation: 4,
+                            //               child: Padding(
+                            //                 padding:
+                            //                     const EdgeInsets.all(8.0),
+                            //                 child: Column(
+                            //                   crossAxisAlignment:
+                            //                       CrossAxisAlignment.start,
+                            //                   mainAxisAlignment:
+                            //                       MainAxisAlignment
+                            //                           .spaceEvenly,
+                            //                   children: [
+                            //                     Text(
+                            //                       "BarCode : ${data.prdouctId}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                     Text(
+                            //                       // 'dghjkesruejrfbj hjrbetmnsg berdmewrgs dfjghjsdbfjwejfhmehjv  iuweku  orkeqjewru oewihi',
+                            //                       "Product Name : ${data.prdouctName}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                     Text(
+                            //                       "Price: ${data.cost.toStringAsFixed(2) ?? 0}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                     Text(
+                            //                       "Quantity : ${data.quantity.toStringAsFixed(2)}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                     if (filterModeselection ==
+                            //                         'D') ...[
+                            //                       Text(
+                            //                         "DiscMode : ${data.discMode}",
+                            //                         style: TextStyle(
+                            //                           fontWeight:
+                            //                               FontWeight.w400,
+                            //                           fontSize: 5.sp,
+                            //                         ),
+                            //                       ),
+                            //                       // Show percentage if mode is percentage
+                            //                       if (data.discMode ==
+                            //                           "Percentage")
+                            //                         Text(
+                            //                           "DiscPercentage : ${data.discPerc.toStringAsFixed(2)}%",
+                            //                           style: TextStyle(
+                            //                             fontWeight:
+                            //                                 FontWeight.w400,
+                            //                             fontSize: 15.sp,
+                            //                           ),
+                            //                         ),
+                            //                       // Show amount if mode is amount
+                            //                       if (data.discMode ==
+                            //                           "Amount")
+                            //                         Text(
+                            //                           "DiscAmount : ${data.discAmount.toStringAsFixed(3)}",
+                            //                           style: TextStyle(
+                            //                             fontWeight:
+                            //                                 FontWeight.w400,
+                            //                             fontSize: 15.sp,
+                            //                           ),
+                            //                         ),
+                            //                     ],
+                            //                     Text(
+                            //                       "Expiry Date : ${data.expiryDate}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                     Text(
+                            //                       "Note : ${data.note.isNotEmpty ? data.note : "N/A"}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                     Text(
+                            //                       "Reason : ${data.reason.isNotEmpty ? data.reason : "N/A"}",
+                            //                       style: TextStyle(
+                            //                         fontWeight:
+                            //                             FontWeight.w400,
+                            //                         fontSize: 15.sp,
+                            //                       ),
+                            //                     ),
+                            //                   ],
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //           ),
+                            //           Positioned(
+                            //             top: 0,
+                            //             right: 0,
+                            //             child: Container(
+                            //               padding:
+                            //                   const EdgeInsets.symmetric(
+                            //                       horizontal: 8,
+                            //                       vertical: 4),
+                            //               decoration: const BoxDecoration(
+                            //                 color: Colors.blueAccent,
+                            //                 borderRadius: BorderRadius.only(
+                            //                   topRight: Radius.circular(8),
+                            //                   bottomLeft:
+                            //                       Radius.circular(8),
+                            //                 ),
+                            //               ),
+                            //               child: Text(
+                            //                 data.reqStatus ??
+                            //                     '', // Dynamic status display
+                            //                 style: const TextStyle(
+                            //                   color: Colors.white,
+                            //                   fontSize: 10,
+                            //                   fontWeight: FontWeight.bold,
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ],
+                            //       );
+                            //     },
+                            //   );
+                          }
+                        }))
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String formatSalesmanDate(String dateTimeStr) {
+    if (dateTimeStr.isEmpty) return 'N/A';
+    try {
+      DateTime parsedDate = DateTime.parse(dateTimeStr);
+      return DateFormat('yyyy-MM-dd').format(parsedDate);
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+
+  Color getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return const Color(0xFF1a237e); // Dark Blue
+      case 'rejected':
+        return Colors.red;
+      case 'pending':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: Colors.grey[600],
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+// -------->>>>>>>>>>>>>>>.--------hcgcgxgcx
+
+// -------->>>>
+
+              // Positioned(
                                           //   right: 5,
                                           //   top: 5,
                                           //   child: CornerBanner(
@@ -300,11 +665,7 @@ class _SalesManReportDetailsScreenState
                                           //     ),
                                           //   ),
                                           // )
-                                        ],
-                                      );
-                                    },
-                                  );
-                            // : ListView.builder(
+                                            // : ListView.builder(
                             //     itemCount:
                             //         reportDetailsListModel.data.length ?? 0,
                             //     itemBuilder: (context, index) {
@@ -438,13 +799,3 @@ class _SalesManReportDetailsScreenState
                             //         ],
                             //       );
                             //     });
-                          }
-                        }))
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
