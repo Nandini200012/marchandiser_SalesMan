@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:marchandise/screens/manager_screens/api_service/manager_api_service.dart';
 import 'package:marchandise/screens/manager_screens/model/report_details_list_model.dart';
@@ -154,6 +153,7 @@ class _SalesManReportDetailsScreenState
                                     itemBuilder: (context, index) {
                                       final data = snapshot.data!.data[index];
                                       return Card(
+                                        color: Colors.white,
                                         elevation: 2,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -182,12 +182,15 @@ class _SalesManReportDetailsScreenState
                                                     horizontal: 16,
                                                     vertical: 12,
                                                   ),
-                                                  decoration: BoxDecoration(
-                                                    color: getStatusColor(
-                                                            data.reqStatus)
-                                                        .withOpacity(0.1),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: Color.fromARGB(
+                                                        255, 255, 207, 64),
+                                                    // color: getStatusColor(
+                                                    //         data.reqStatus)
+                                                    //     .withOpacity(0.1),
                                                     borderRadius:
-                                                        const BorderRadius.only(
+                                                        BorderRadius.only(
                                                       topLeft:
                                                           Radius.circular(12),
                                                       topRight:
@@ -243,8 +246,9 @@ class _SalesManReportDetailsScreenState
                                                         ),
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: getStatusColor(
-                                                              data.reqStatus),
+                                                          color: Colors.white,
+                                                          // color: getStatusColor(
+                                                          //     data.reqStatus),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(16),
@@ -253,10 +257,10 @@ class _SalesManReportDetailsScreenState
                                                           data.reqStatus,
                                                           style:
                                                               const TextStyle(
-                                                            color: Colors.white,
+                                                            color: Colors.black,
                                                             fontSize: 12,
                                                             fontWeight:
-                                                                FontWeight.w500,
+                                                                FontWeight.w700,
                                                           ),
                                                         ),
                                                       ),
@@ -294,7 +298,9 @@ class _SalesManReportDetailsScreenState
                                                                 Icons
                                                                     .calendar_today_outlined,
                                                                 'Expiry',
-                                                                data.expiryDate ??
+                                                                DateFormat('dd MMM, yyyy')
+                                                                        .format(
+                                                                            data.expiryDate) ??
                                                                     'N/A',
                                                               ),
                                                             ),
@@ -373,29 +379,6 @@ class _SalesManReportDetailsScreenState
                                                                     : 'N/A',
                                                               ),
                                                             ),
-
-                                                            // if (data.reason.isNotEmpty)
-
-                                                            Expanded(
-                                                              child:
-                                                                  _buildInfoRow(
-                                                                Icons
-                                                                    .calendar_month,
-                                                                'Expiry Date',
-                                                                formatSalesmanDate(data
-                                                                        .expiryDate
-                                                                        .toString()) ??
-                                                                    'N/A',
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const Divider(
-                                                            height: 16),
-                                                        // if (data.note.isNotEmpty)
-                                                        Row(
-                                                          children: [
-                                                            // if (data.reason.isNotEmpty)
                                                             Expanded(
                                                               child:
                                                                   _buildInfoRow(
@@ -408,8 +391,42 @@ class _SalesManReportDetailsScreenState
                                                                     : 'N/A',
                                                               ),
                                                             ),
+                                                            // if (data.reason.isNotEmpty)
+
+                                                            // Expanded(
+                                                            //   child:
+                                                            //       _buildInfoRow(
+                                                            //     Icons
+                                                            //         .calendar_month,
+                                                            //     'Expiry Date',
+                                                            //     formatSalesmanDate(data
+                                                            //             .expiryDate
+                                                            //             .toString()) ??
+                                                            //         'N/A',
+                                                            //   ),
+                                                            // ),
                                                           ],
                                                         ),
+                                                        // const Divider(
+                                                        //     height: 16),
+                                                        // // if (data.note.isNotEmpty)
+                                                        // Row(
+                                                        //   children: [
+                                                        //     // if (data.reason.isNotEmpty)
+                                                        //     Expanded(
+                                                        //       child:
+                                                        //           _buildInfoRow(
+                                                        //         Icons
+                                                        //             .note_outlined,
+                                                        //         'Note',
+                                                        //         data.note
+                                                        //                 .isNotEmpty
+                                                        //             ? data.note
+                                                        //             : 'N/A',
+                                                        //       ),
+                                                        //     ),
+                                                        //   ],
+                                                        // ),
                                                       ],
                                                     ),
                                                   ),

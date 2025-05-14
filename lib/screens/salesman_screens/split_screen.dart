@@ -412,6 +412,13 @@ class _SplitScreenState extends State<SplitScreen> {
 
     // Check if discount amount exceeds product cost
     if (_splitDiscountMode == DiscountMode.amount &&
+            discountValue > widget.product.cost ||
+        discountValue < 0) {
+      _showError(
+          'Discount amount cannot be less than zero or exceed product cost.');
+      return;
+    }
+    if (_splitDiscountMode == DiscountMode.amount &&
         discountValue > widget.product.cost) {
       _showError('Discount amount cannot be greater than the product Price.');
       return;

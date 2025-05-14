@@ -109,8 +109,8 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
               backgroundColor: Colors.white,
               elevation: 0.5,
               automaticallyImplyLeading: false,
-              title: Text(
-                "Salesman Panel",
+              title: const Text(
+                "Sales Manager",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -120,16 +120,16 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
               centerTitle: true,
               actions: [
                 Padding(
-                  padding: EdgeInsets.only(right: 24),
+                  padding: const EdgeInsets.only(right: 24),
                   child: GestureDetector(
                     onTap: () {
                       DynamicAlertBox().logOut(context, "Do you want to logout",
                           () {
-                        Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => SplashScreen()));
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (_) => const SplashScreen()));
                       });
                     },
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       backgroundColor: Colors.amber,
                       radius: 20,
                       child: Text("SM", style: TextStyle(color: Colors.white)),
@@ -141,7 +141,8 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
             body: RefreshIndicator(
               onRefresh: _refreshData,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 child: Column(
                   children: [
                     /// HEADER: Search, Filters, Sort
@@ -149,7 +150,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Requests [$totalRequests]",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             )),
@@ -161,11 +162,11 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                               child: TextField(
                                 onChanged: _filterRequests,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.search),
+                                  prefixIcon: const Icon(Icons.search),
                                   hintText: "Search by name or code",
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: EdgeInsets.symmetric(
+                                  contentPadding: const EdgeInsets.symmetric(
                                       vertical: 12, horizontal: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -174,12 +175,12 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
 
                             /// Sort dropdown
                             DropdownButton<String>(
                               value: selectedSortOption,
-                              underline: SizedBox(),
+                              underline: const SizedBox(),
                               borderRadius: BorderRadius.circular(8),
                               items: ['Customer Name', 'PostDate'].map((value) {
                                 return DropdownMenuItem(
@@ -214,7 +215,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                         )
                       ],
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     /// GRID
                     Expanded(
@@ -223,19 +224,21 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
+                            return const Center(
+                                child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
                             return Center(
                                 child: Text("Error: ${snapshot.error}"));
                           } else if (!snapshot.hasData ||
                               snapshot.data!.data.isEmpty) {
-                            return Center(child: Text("No requests available"));
+                            return const Center(
+                                child: Text("No requests available"));
                           }
 
                           return GridView.builder(
-                            padding: EdgeInsets.only(top: 10),
+                            padding: const EdgeInsets.only(top: 10),
                             gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
+                                const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
                               mainAxisSpacing: 20,
                               crossAxisSpacing: 20,
@@ -248,12 +251,12 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                               return MouseRegion(
                                 cursor: SystemMouseCursors.click,
                                 child: AnimatedContainer(
-                                  duration: Duration(milliseconds: 200),
+                                  duration: const Duration(milliseconds: 200),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
-                                      BoxShadow(
+                                      const BoxShadow(
                                         color: Colors.black12,
                                         blurRadius: 6,
                                         offset: Offset(0, 3),
@@ -261,7 +264,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                     ],
                                   ),
                                   child: Padding(
-                                    padding: EdgeInsets.all(16),
+                                    padding: const EdgeInsets.all(16),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -271,7 +274,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                         /// Header row
                                         Row(
                                           children: [
-                                            SizedBox(width: 12),
+                                            const SizedBox(width: 12),
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
@@ -279,30 +282,71 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                                 children: [
                                                   Text(
                                                     request.vendorName,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         fontSize: 16),
                                                   ),
-                                                  SizedBox(height: 4),
-                                                  Text(
-                                                    'Customer Code: ${request.vendorCode}',
-                                                    style: TextStyle(
-                                                        fontSize: 13,
-                                                        color: Colors.grey),
-                                                  ),
-                                                  Text(
-                                                    'Post Date: ${request.date}',
-                                                    style: TextStyle(
-                                                        fontSize: 13,
-                                                        color: Colors.grey),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            'Customer Code: ${request.vendorCode}',
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: Colors
+                                                                        .grey),
+                                                          ),
+                                                          Text(
+                                                            'Post Date: ${request.date}',
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: Colors
+                                                                        .grey),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Spacer(),
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color
+                                                              .fromARGB(
+                                                              255, 255, 179, 0),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                            'Req ID: ${request.requestId}',
+                                                            style: const TextStyle(
+                                                                fontSize: 13,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
                                             )
                                           ],
                                         ),
-                                        Divider(height: 24),
+                                        const Divider(height: 24),
 
                                         /// Footer row
                                         Row(
@@ -311,7 +355,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                           children: [
                                             Text(
                                               "${request.totalProduct} Products",
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black87),
@@ -336,10 +380,12 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                               },
                                               style: TextButton.styleFrom(
                                                 foregroundColor:
-                                                    Colors.amber.shade800,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20,
-                                                    vertical: 8),
+                                                    const Color.fromARGB(
+                                                        255, 255, 183, 0),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 8),
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(6),
@@ -348,7 +394,7 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                                           .amber.shade800),
                                                 ),
                                               ),
-                                              child: Text("Details"),
+                                              child: const Text("Details"),
                                             ),
                                             IconButton(
                                                 onPressed: () {
@@ -363,8 +409,8 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
                                                 },
                                                 icon: Icon(
                                                     Icons.message_outlined,
-                                                    color:
-                                                        Colors.amber.shade800)),
+                                                    color: const Color.fromARGB(
+                                                        255, 255, 170, 0))),
                                           ],
                                         )
                                       ],
