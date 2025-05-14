@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 ReportDetailsListModel reportDetailsListModelFromJson(String str) =>
     ReportDetailsListModel.fromJson(json.decode(str));
 
@@ -39,7 +41,7 @@ class Datum {
   dynamic prdouctId;
   String prdouctName;
   num quantity;
-  String expiryDate;
+  DateTime expiryDate;
   String note;
   String reason;
   String reqStatus;
@@ -70,7 +72,7 @@ class Datum {
         prdouctId: json["prdouctID"],
         prdouctName: json["prdouctName"],
         quantity: json["quantity"],
-        expiryDate: json["expiryDate"],
+        expiryDate: DateFormat("dd/MM/yyyy").parse(json["expiryDate"]),
         note: json["note"],
         reason: json["reason"],
         reqStatus: json["reqStatus"],

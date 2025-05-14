@@ -98,508 +98,336 @@ class _SalesmanHomeScreenState extends State<SalesmanHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: const Size(1440, 1024), // Web default
+      minTextAdapt: true,
       builder: (context, child) {
         return WillPopScope(
-          onWillPop: () async {
-            return willpop.onWillPop();
-          },
+          onWillPop: () async => willpop.onWillPop(),
           child: Scaffold(
+            backgroundColor: const Color(0xFFF0F2F5),
             appBar: AppBar(
-              backgroundColor: Color(0xFFFFF9C4),
+              backgroundColor: Colors.white,
+              elevation: 0.5,
               automaticallyImplyLeading: false,
-              title: Text(
-                "Sales Man",
-                style:
-                    TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
+              title: const Text(
+                "Sales Manager",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
               centerTitle: true,
               actions: [
                 Padding(
-                  padding: EdgeInsets.only(right: 15.w),
+                  padding: const EdgeInsets.only(right: 24),
                   child: GestureDetector(
                     onTap: () {
-                      DynamicAlertBox().logOut(context, "Do you Want to Logout",
+                      DynamicAlertBox().logOut(context, "Do you want to logout",
                           () {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => SplashScreen()));
+                            builder: (_) => const SplashScreen()));
                       });
                     },
-                    child: CircleAvatar(
-                      radius: 22.r,
-                      child: Text("SM"),
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.amber,
+                      radius: 20,
+                      child: Text("SM", style: TextStyle(color: Colors.white)),
                     ),
                   ),
-                ),
+                )
               ],
             ),
-            resizeToAvoidBottomInset: false,
             body: RefreshIndicator(
               onRefresh: _refreshData,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
-                    )),
-                    child: SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.all(10.w),
-                        child: Column(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                child: Column(
+                  children: [
+                    /// HEADER: Search, Filters, Sort
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Requests [$totalRequests]",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            )),
+                        Row(
                           children: [
-                            SizedBox(height: 5.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Request [$totalRequests]",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight
-                                        .w600, // Use a slightly heavier weight
-                                    color: Colors.black,
-                                    fontSize: 5
-                                        .sp, // Increase the font size for better readability
+                            /// Search box
+                            SizedBox(
+                              width: 300,
+                              child: TextField(
+                                onChanged: _filterRequests,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.search),
+                                  hintText: "Search by name or code",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 16),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide.none,
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 200.w, // Maintain search box width
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(
-                                                0.2), // Subtle shadow for depth
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: Offset(0,
-                                                3), // Offset for slight lift effect
-                                          ),
-                                        ],
-                                      ),
-                                      child: TextField(
-                                        onChanged: _filterRequests,
-                                        decoration: InputDecoration(
-                                          prefixIcon: Icon(Icons.search,
-                                              color: Colors.grey
-                                                  .shade600), // Lighter icon color
-                                          hintText: "Search",
-                                          hintStyle: TextStyle(
-                                            fontSize: 5
-                                                .sp, // Slightly larger font size
-                                            color: Colors.grey
-                                                .shade500, // Softer hint text color
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 12
-                                                .h, // Increased vertical padding for a comfortable click area
-                                            horizontal: 10.w,
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10.r),
-                                            borderSide: BorderSide(
-                                                color: Colors.grey
-                                                    .shade300), // Soft border color
-                                          ),
-                                        ),
-                                        style: TextStyle(
-                                            fontSize: 5
-                                                .sp), // Larger input text size for readability
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        width: 8
-                                            .w), // Add more spacing between search and dropdown
-
-                                    // Dropdown for sorting options
-                                    Container(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 5.w),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        border: Border.all(
-                                            color: Colors.grey.shade300),
-                                      ),
-                                      child: DropdownButton<String>(
-                                        value: selectedSortOption,
-                                        items: <String>[
-                                          'Customer Name',
-                                          'PostDate'
-                                        ].map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(
-                                              value,
-                                              style: TextStyle(
-                                                  fontSize: 5
-                                                      .sp), // Larger font for better readability
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedSortOption = newValue!;
-                                            _sortRequests();
-                                          });
-                                        },
-                                        underline:
-                                            SizedBox(), // Remove default underline
-                                        icon: Icon(Icons.arrow_drop_down,
-                                            color: Colors
-                                                .black), // Modern dropdown arrow
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        width: 8
-                                            .w), // Consistent spacing between elements
-
-                                    IconButton(
-                                      icon: Icon(
-                                        isAscending
-                                            ? Icons.arrow_upward
-                                            : Icons.arrow_downward,
-                                        color: Colors.black.withOpacity(
-                                            0.7), // Slightly transparent for a smoother look
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          isAscending = !isAscending;
-                                          _sortRequests(); // Toggle sorting direction
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10.h),
-                            Expanded(
-                              child: FutureBuilder<SalesmanRequestListModel>(
-                                future: salesRequestList,
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return Center(
-                                        child: CircularProgressIndicator());
-                                  } else if (snapshot.hasError) {
-                                    return Center(
-                                        child:
-                                            Text("Error: ${snapshot.error}"));
-                                  } else if (!snapshot.hasData ||
-                                      snapshot.data!.data.isEmpty) {
-                                    return Center(
-                                        child: Text("No Request Available"));
-                                  } else {
-                                    List<Datum> datums = filteredRequests;
-                                    return GridView.builder(
-                                      gridDelegate:
-                                          SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount:
-                                            constraints.maxWidth > 600 ? 3 : 1,
-                                        childAspectRatio:
-                                            constraints.maxWidth > 600
-                                                ? 2
-                                                : 6.5,
-                                        crossAxisSpacing: 10.w,
-                                        mainAxisSpacing: 10.h,
-                                      ),
-                                      itemCount: datums.length,
-                                      itemBuilder: (context, index) {
-                                        String selectedVendorName =
-                                            datums[index].vendorName;
-                                        String selectedVendortId =
-                                            datums[index].vendorCode.toString();
-                                        String selectedProductQuantity =
-                                            datums[index]
-                                                .totalProduct
-                                                .toString();
-                                        int requesId = datums[index].requestId;
-                                        String productFirstLetter =
-                                            selectedVendorName.substring(0, 1);
-                                        String date = datums[index].date;
-
-                                        return Column(
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 8.h),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.5),
-                                                      spreadRadius: 2,
-                                                      blurRadius: 5,
-                                                      offset: Offset(0, 3),
-                                                    ),
-                                                  ],
-                                                  border: Border.all(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.5)),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.r),
-                                                ),
-                                                child: Column(
-                                                  children: [
-                                                    ListTile(
-                                                      leading: CircleAvatar(
-                                                        backgroundColor:
-                                                            Color(0xFFFBC02D),
-                                                        child: Text(
-                                                          productFirstLetter,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                      ),
-                                                      title: Text(
-                                                        selectedVendorName,
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 3.sp,
-                                                        ),
-                                                      ),
-                                                      subtitle: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            'Customer Code : $selectedVendortId',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .grey),
-                                                          ),
-                                                          Text(
-                                                            'Post Date : $date',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .grey),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Divider(
-                                                      color: Colors.grey,
-                                                      thickness: 1.h,
-                                                      indent: 16.w,
-                                                      endIndent: 16.w,
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsets.all(8.w),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceEvenly,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                selectedProductQuantity,
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      constraints.maxWidth >
-                                                                              600
-                                                                          ? 4.sp
-                                                                          : 18.sp,
-                                                                  color: Color(
-                                                                      0xFFFBC02D),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 5.w),
-                                                              Text(
-                                                                "Products",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      constraints.maxWidth >
-                                                                              600
-                                                                          ? 3.sp
-                                                                          : 12.sp,
-                                                                  color: Colors
-                                                                      .grey,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          SizedBox(
-                                                            width: constraints
-                                                                        .maxWidth >
-                                                                    600
-                                                                ? 50.w
-                                                                : 150.w,
-                                                            child: TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .push(
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) {
-                                                                    return RequestDetailsScreen(
-                                                                      vendorName:
-                                                                          selectedVendorName,
-                                                                      vendorId:
-                                                                          selectedVendortId,
-                                                                      requestId:
-                                                                          requesId,
-                                                                    );
-                                                                  }),
-                                                                );
-                                                              },
-                                                              child: Text(
-                                                                "Details",
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Color(
-                                                                      0xFFFBC02D),
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize:
-                                                                      constraints.maxWidth >
-                                                                              600
-                                                                          ? 4.sp
-                                                                          : 12.sp,
-                                                                ),
-                                                              ),
-                                                              style:
-                                                                  ButtonStyle(
-                                                                padding:
-                                                                    MaterialStateProperty
-                                                                        .all(
-                                                                  EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          10.h),
-                                                                ),
-                                                                side: MaterialStateProperty
-                                                                    .all<
-                                                                        BorderSide>(
-                                                                  BorderSide(
-                                                                    color: Color(
-                                                                        0xFFFBC02D),
-                                                                    width:
-                                                                        1.0.w,
-                                                                  ),
-                                                                ),
-                                                                shape: MaterialStateProperty
-                                                                    .all<
-                                                                        OutlinedBorder>(
-                                                                  RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            10.r),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          IconButton(
-                                                            onPressed: () {
-                                                              log('home: $requesId, ');
-                                                              showCommentPopup(
-                                                                  context,
-                                                                  requestID:
-                                                                      requesId,
-                                                                  productID:
-                                                                      "-1",
-                                                                  productName:
-                                                                      'null');
-                                                            },
-                                                            icon: Icon(
-                                                                Icons.message),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
-                                },
                               ),
                             ),
+                            const SizedBox(width: 20),
+
+                            /// Sort dropdown
+                            DropdownButton<String>(
+                              value: selectedSortOption,
+                              underline: const SizedBox(),
+                              borderRadius: BorderRadius.circular(8),
+                              items: ['Customer Name', 'PostDate'].map((value) {
+                                return DropdownMenuItem(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedSortOption = value!;
+                                  _sortRequests();
+                                });
+                              },
+                            ),
+
+                            /// Toggle sorting
+                            IconButton(
+                              icon: Icon(
+                                isAscending
+                                    ? Icons.arrow_upward
+                                    : Icons.arrow_downward,
+                                color: Colors.black87,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isAscending = !isAscending;
+                                  _sortRequests();
+                                });
+                              },
+                            ),
                           ],
-                        ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    /// GRID
+                    Expanded(
+                      child: FutureBuilder<SalesmanRequestListModel>(
+                        future: salesRequestList,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text("Error: ${snapshot.error}"));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.data.isEmpty) {
+                            return const Center(
+                                child: Text("No requests available"));
+                          }
+
+                          return GridView.builder(
+                            padding: const EdgeInsets.only(top: 10),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: 20,
+                              crossAxisSpacing: 20,
+                              childAspectRatio: 2.5,
+                            ),
+                            itemCount: filteredRequests.length,
+                            itemBuilder: (context, index) {
+                              final request = filteredRequests[index];
+
+                              return MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      const BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 3),
+                                      )
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        /// Header row
+                                        Row(
+                                          children: [
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    request.vendorName,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            'Customer Code: ${request.vendorCode}',
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: Colors
+                                                                        .grey),
+                                                          ),
+                                                          Text(
+                                                            'Post Date: ${request.date}',
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: Colors
+                                                                        .grey),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Spacer(),
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color
+                                                              .fromARGB(
+                                                              255, 255, 179, 0),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                            'Req ID: ${request.requestId}',
+                                                            style: const TextStyle(
+                                                                fontSize: 13,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const Divider(height: 24),
+
+                                        /// Footer row
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "${request.totalProduct} Products",
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black87),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        RequestDetailsScreen(
+                                                      vendorName:
+                                                          request.vendorName,
+                                                      vendorId: request
+                                                          .vendorCode
+                                                          .toString(),
+                                                      requestId:
+                                                          request.requestId,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: TextButton.styleFrom(
+                                                foregroundColor:
+                                                    const Color.fromARGB(
+                                                        255, 255, 183, 0),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 8),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  side: BorderSide(
+                                                      color: Colors
+                                                          .amber.shade800),
+                                                ),
+                                              ),
+                                              child: const Text("Details"),
+                                            ),
+                                            IconButton(
+                                                onPressed: () {
+                                                  log('Comment: ${request.requestId}');
+                                                  showCommentPopup(
+                                                    context,
+                                                    requestID:
+                                                        request.requestId,
+                                                    productID: "-1",
+                                                    productName: "null",
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                    Icons.message_outlined,
+                                                    color: const Color.fromARGB(
+                                                        255, 255, 170, 0))),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
             ),
           ),
-        );
-      },
-    );
-  }
-
-  commentPopup() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        TextEditingController _commentController = TextEditingController();
-        return AlertDialog(
-          title: Text('Add Comment'),
-          content: TextField(
-            controller: _commentController,
-            maxLines: 3,
-            decoration: InputDecoration(
-              hintText: 'Enter your comment',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the popup
-              },
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                String comment = _commentController.text;
-                // TODO: Handle comment submission logic here
-                Navigator.pop(context);
-              },
-              child: Text('Submit'),
-            ),
-          ],
         );
       },
     );

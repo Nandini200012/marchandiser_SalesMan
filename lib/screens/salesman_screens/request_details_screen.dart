@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:marchandise/provider/split_provider.dart';
-import 'package:marchandise/screens/model/comment_model.dart';
 import 'package:marchandise/screens/salesman_screens/api_service/salesman_api_service.dart';
 import 'package:marchandise/screens/salesman_screens/model/salesman_request_by_id_model.dart';
 import 'package:marchandise/screens/salesman_screens/model/salesman_request_list_model.dart';
@@ -21,7 +20,6 @@ import 'package:marchandise/utils/willpop.dart';
 import 'package:provider/provider.dart';
 import 'package:marchandise/screens/salesman_screens/model/salesman_info_model.dart'
     as info;
-import 'package:marchandise/provider/salesman_request_provider.dart';
 import 'package:marchandise/screens/splash_screen.dart';
 import 'package:marchandise/utils/dynamic_alert_box.dart';
 import 'package:http/http.dart' as http;
@@ -106,6 +104,8 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
   late TextEditingController _discountController;
   bool _isEditingQty = false;
   Product? _editingProduct;
+  double? discountGlobal;
+  String? valueGlobal;
   TextEditingController _qtyController = TextEditingController();
 
   @override
@@ -515,7 +515,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                         _showEditPriceDialog(product);
                                       },
                                       child: Text(
-                                        'Cost',
+                                        'Price',
                                         style: GoogleFonts.roboto(
                                           color: Colors.blue,
                                           fontSize: 12,
@@ -550,7 +550,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                       onTap: () {
                                         _showEditQuantityDialog(product);
                                       },
-                                      child: Text(
+                                      child: const Text(
                                         'Qty',
                                         style: TextStyle(
                                           color: Colors.blue,
@@ -566,7 +566,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                       },
                                       child: Text(
                                         product.qty.toStringAsFixed(2),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.blue,
                                           fontSize: 13,
                                           // fontWeight: FontWeight.w700,
@@ -602,7 +602,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                     ),
                                     Text(
                                       _formattedExpiryDate(product.expiryDate),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 13,
                                         // fontWeight: FontWeight.w700,
@@ -626,7 +626,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                   ),
                                   Text(
                                     product.uom.toString(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 13,
                                       // fontWeight: FontWeight.w700,
@@ -667,7 +667,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                     ),
                                     Text(
                                       '${product.reason}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 13,
                                         // fontWeight: FontWeight.w700,
@@ -754,7 +754,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                   ? 6.h
                                   : 2.h), // Reduced gap between lines
                           // Status and discount section
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1238,21 +1238,7 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                                 _discountController.clear();
                               });
                             } else {
-                              setState(() {
-                                product.discountValue = value;
-                                if (product.discountMode ==
-                                    DiscountMode.percentage) {
-                                  product.discountPercentage = discount;
-                                  product.discountAmount =
-                                      (product.cost ?? 0) * (discount / 100);
-                                  product.status = 'Discount';
-                                } else {
-                                  product.discountAmount = discount;
-                                  product.discountPercentage =
-                                      (discount / (product.cost ?? 1)) * 100;
-                                  product.status = 'Discount';
-                                }
-                              });
+                              discountfunction(product, discount, value);
                             }
                           },
                           decoration: InputDecoration(
@@ -1334,6 +1320,29 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
         );
       },
     );
+  }
+
+  discountfunction(Product product, double discount, String value) {
+    setState(() {
+      product.discountValue = value;
+      if (product.discountMode == DiscountMode.percentage) {
+        product.discountPercentage = discount;
+        product.discountAmount = (product.cost ?? 0) * (discount / 100);
+        product.status = 'Discount';
+      } else {
+        product.discountAmount = discount;
+        product.discountPercentage = (discount / (product.cost ?? 1)) * 100;
+        product.status = 'Discount';
+      }
+    });
+    setdiscountvalue(product, discount, value);
+  }
+
+  setdiscountvalue(Product product, double discount, String value) {
+    setState(() {
+      discountGlobal = discount;
+      valueGlobal = value;
+    });
   }
 
   void _showConfirmationDialog(BuildContext context, Product product) {
@@ -1852,6 +1861,10 @@ class _RequestDetailsScreenState extends State<RequestDetailsScreen> {
                         product.cost = enteredPrice;
                         createDataList(); // Update the data list when price changes
                       });
+                      if (discountGlobal != null && valueGlobal != null) {
+                        discountfunction(
+                            product, discountGlobal!, valueGlobal!);
+                      }
                       log('after: Price updated to $enteredPrice for product ${product.cost}');
                     }
                   },
